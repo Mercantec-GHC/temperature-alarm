@@ -14,6 +14,8 @@ namespace Models
 
         public double TempLow { get; set; }
 
-        public List<TemperatureLogs> Logs { get; set; }
+        public string? UnikId { get; set; }
+
+        public List<TemperatureLogs>? Logs { get; set; }
     }
 }
