@@ -1,43 +1,46 @@
-#include <mosquitto.h>
+#include <pthread.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
 #include <stdio.h>
 
-#include "config.h"
+#include "mqtt.h"
+#include "temperature.h"
 
-void on_connect(struct mosquitto *client, void *obj, int rc)
+void *watch_temperature(void *arg)
 {
-	if (rc != 0) {
-		fprintf(stderr, "%s\n", mosquitto_connack_string(rc));
-		return;
+	init_temperature();
+
+	get_temperature();
+
+	while (true) {
+		double temperature = get_temperature();
+
+		char *str = malloc(snprintf(NULL, 0, "%lf", temperature) + 1);
+		sprintf(str, "%lf", temperature);
+
+		mqtt_send_message("/temperature", str);
+
+		free(str);
+
+		printf("Temperature: %lf\n", temperature);
+
+		sleep(60);
 	}
 
-	puts("Connected to " MQTT_IP);
+	return NULL;
 }
 
-void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
+void mqtt_on_connect(void)
 {
-	printf("Received message on topic %s\n", message->topic);
+	pthread_t temperature_thread;
+	pthread_create(&temperature_thread, NULL, watch_temperature, NULL);
 }
 
 int main(void)
 {
-	int version[3];
-	mosquitto_lib_init();
-	mosquitto_lib_version(&version[0], &version[1], &version[2]);
-	printf("Using mosquitto library version %i.%i.%i\n", version[0], version[1], version[2]);
-
-	struct mosquitto *mosq = mosquitto_new(NULL, true, NULL);
-
-	mosquitto_connect_callback_set(mosq, on_connect);
-	mosquitto_message_callback_set(mosq, on_message);
-
-	mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD);
-	mosquitto_connect(mosq, MQTT_IP, MQTT_PORT, 60);
-
-	mosquitto_loop_forever(mosq, -1, 1);
-
-	mosquitto_destroy(mosq);
-	mosquitto_lib_cleanup();
+	init_mqtt();
 
 	return EXIT_SUCCESS;
 }
