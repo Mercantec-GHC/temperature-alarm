@@ -13,6 +13,7 @@ namespace Api.Controllers
         {
             _context = context;
         }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] User user)
         {
@@ -31,11 +32,11 @@ namespace Api.Controllers
             return Ok();
         }
 
-        [HttpPut("Edit")]
-        public async Task<IActionResult> EditUser([FromBody] User user)
+        [HttpPut("Edit/{userId}")]
+        public async Task<IActionResult> EditUser([FromBody] User user, int userId)
         {
             DBAccess.DBAccess dBAccess = new DBAccess.DBAccess(_context);
-            bool success = await dBAccess.EditUser(user);
+            bool success = await dBAccess.EditUser(user, userId);
             if (!success) { return BadRequest(new { error = "User can't be edited" }); }
             return Ok();
         }
