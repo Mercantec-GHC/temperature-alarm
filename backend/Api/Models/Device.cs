@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models
+﻿namespace Api.Models
 {
     public class Device
     {
@@ -14,7 +8,7 @@ namespace Models
 
         public double TempLow { get; set; }
 
-        public string? UnikId { get; set; }
+        public string? ReferenceId { get; set; }
 
         public List<TemperatureLogs>? Logs { get; set; }
     }
