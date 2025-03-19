@@ -4,18 +4,25 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
     <div class="container">
-        <form action="" method="post">
-            <div class="form-container ">
+        <form id="registerForm">
+            <div class="form-container">
+                <h1>Create Account</h1>
+
+                <label for="email"><b>Email</b></label>
+                <input type="email" placeholder="Enter email "id="email" required>
+
                 <label for="uname"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
+                <input type="text" placeholder="Enter username" id="uname" required>
 
                 <label for="psw"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
+                <input type="password" placeholder="Enter password" id="psw" required>
 
-                <button type="submit">Login</button>
+                <label for="rpsw"><b>Repeat Password</b></label>
+                <input type="password" placeholder="Enter password again" id="rpsw" required>
+
+                <button type="submit">Register</button>
                 <div class="loginText">
                     <label>
                         Already have an account? <a href="../login/login.html">Login</a>
@@ -25,6 +32,8 @@
         </form>
     </div>
 </body>
+
 <link rel="stylesheet" href="register.css">
+<script type="module" src="register.js"></script>
 
 </html>

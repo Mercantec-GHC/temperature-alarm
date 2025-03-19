@@ -1,32 +1,35 @@
 const address = "http://10.135.51.116/temperature-alarm-webapi/users"
 
-function login(username, password) {
+export function login(usernameOrEmail, password) {
+    console.log(usernameOrEmail);
+    console.log(password);
+
     fetch(`${address}/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({username: username, password: password})
+        body: JSON.stringify({usernameOrEmail: usernameOrEmail, password: password})
     })
     .then(response => response.json())
     .then(data => console.log("Success:", data))
     .catch(error => console.error("Error:", error));
 }
 
-function create(email, username, password){
+export function create(email, username, password, repeatPassword){
     fetch(`${address}/create`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({email: email, username: username, password: password})
+        body: JSON.stringify({email: email, username: username, password: password, repeatPassword: repeatPassword})
     })
     .then(response => response.json())
     .then(data => console.log("Success:", data))
     .catch(error => console.error("Error:", error));
 }
 
-function update(email, username, password){
+export function update(email, username, password){
     fetch(`${address}/update`, {
         method: "PATCH",
         headers: {

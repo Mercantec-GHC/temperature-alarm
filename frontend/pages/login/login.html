@@ -7,13 +7,15 @@
 
 <body>
   <div class="container">
-    <form action="" method="post">
+    <form id="loginForm">
       <div class="form-container">
-        <label for="uname"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="uname" required>
+        <h1>Login</h1>
+
+        <label for="emailorusn"><b>Email or Username</b></label>
+        <input type="text" placeholder="Enter email or username" id="emailorusn" required>
 
         <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="psw" required>
+        <input type="password" placeholder="Enter password" id="psw" required>
 
         <button type="submit">Login</button>
         <div class="registerText">
@@ -29,5 +31,6 @@
   </div>
 </body>
 <link rel="stylesheet" href="login.css">
+<script type="module" src="login.js"></script>
 
 </html>
