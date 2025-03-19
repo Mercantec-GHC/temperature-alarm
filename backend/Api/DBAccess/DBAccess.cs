@@ -44,7 +44,7 @@ namespace Api.DBAccess
             return new User();
         }
 
-        public async Task<bool> EditUser(User user, int userId)
+        public async Task<bool> UpdateUser(User user, int userId)
         {
             var profile = await _context.Users.FirstAsync(u => u.Id == userId);
 
@@ -57,7 +57,7 @@ namespace Api.DBAccess
             return await _context.SaveChangesAsync() == 1;
         }
 
-        public async Task<List<Device>> GetDevices(int userId)
+        public async Task<List<Device>> ReadDevices(int userId)
         {
             var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -68,7 +68,7 @@ namespace Api.DBAccess
             return devices;
         }
 
-        public async Task<bool> AddDevice(Device device, int userId)
+        public async Task<bool> CreateDevice(Device device, int userId)
         {
             var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -77,6 +77,30 @@ namespace Api.DBAccess
             if (device.Logs == null) { device.Logs = new List<TemperatureLogs>(); }
 
             user.Devices.Add(device);
+
+            return await _context.SaveChangesAsync() == 1;
+        }
+
+        public async Task<List<TemperatureLogs>> ReadLogs(int deviceId)
+        {
+            var device = await _context.Devices.Include(d => d.Logs).FirstOrDefaultAsync(d => d.Id == deviceId);
+
+            if (device == null || device.Logs == null) { return new List<TemperatureLogs>(); }
+
+            var logs = device.Logs;
+
+            return logs;
+        }
+
+        public async Task<bool> UpdateDevice(Device device, int deviceId)
+        {
+            var device1 = await _context.Devices.FirstAsync(u => u.Id == deviceId);
+
+            device1.TempLow = device.TempLow;
+
+            device1.TempHigh = device.TempHigh;
+
+            device1.ReferenceId = device.ReferenceId;
 
             return await _context.SaveChangesAsync() == 1;
         }

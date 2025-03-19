@@ -36,7 +36,7 @@ namespace Api.Controllers
         public async Task<IActionResult> EditUser([FromBody] User user, int userId)
         {
             DBAccess.DBAccess dBAccess = new DBAccess.DBAccess(_context);
-            bool success = await dBAccess.EditUser(user, userId);
+            bool success = await dBAccess.UpdateUser(user, userId);
             if (!success) { return BadRequest(new { error = "User can't be edited" }); }
             return Ok();
         }
