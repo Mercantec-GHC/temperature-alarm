@@ -15,7 +15,7 @@ namespace Api.Controllers
             _context = context;
         }
 
-
+        // For at få json webtokens til at virke skriv [Authorize] over de endpoints
         [HttpGet]
         public async Task<IActionResult> GetDevices(int userId)
         {
