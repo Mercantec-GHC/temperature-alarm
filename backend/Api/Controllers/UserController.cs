@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Models;
+using Api.Models;
+using Api.DBAccess;
 
 namespace Api.Controllers
 {
@@ -17,7 +18,7 @@ namespace Api.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] User user)
         {
-            DBAccess.DBAccess dBAccess = new DBAccess.DBAccess(_context);
+            DbAccess dBAccess = new DbAccess(_context);
             user = await dBAccess.Login(user);
             if (user.Id == 0) { return BadRequest(new { error = "User can't be logged in" }); }
             return Ok(user);
@@ -26,7 +27,7 @@ namespace Api.Controllers
         [HttpPost("Create")]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            DBAccess.DBAccess dBAccess = new DBAccess.DBAccess(_context);
+            DbAccess dBAccess = new DbAccess(_context);
             bool success = await dBAccess.CreateUser(user);
             if (!success) { return BadRequest(new { error = "User can't be created" }); }
             return Ok();
@@ -35,7 +36,7 @@ namespace Api.Controllers
         [HttpPut("Edit/{userId}")]
         public async Task<IActionResult> EditUser([FromBody] User user, int userId)
         {
-            DBAccess.DBAccess dBAccess = new DBAccess.DBAccess(_context);
+            DbAccess dBAccess = new DbAccess(_context);
             bool success = await dBAccess.UpdateUser(user, userId);
             if (!success) { return BadRequest(new { error = "User can't be edited" }); }
             return Ok();

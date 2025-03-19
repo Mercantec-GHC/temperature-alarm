@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models;
+using Api.Models;
+
 
 namespace Api.DBAccess
 {
-    public class DBAccess
+    public class DbAccess
     {
         private readonly DBContext _context;
 
-        public DBAccess(DBContext context)
+        public DbAccess(DBContext context)
         {
             _context = context;
         }
