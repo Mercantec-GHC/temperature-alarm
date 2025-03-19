@@ -2,14 +2,28 @@ using Api;
 using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
-var app = WebHost.CreateDefaultBuilder(args)
-	.UseUrls("http://0.0.0.0:5000")
-	.UseStartup<Startup>()
-	.Build();
+class Program
+{
+    public static void Main(string[] args)
+    {
+        var app = CreateWebHostBuilder(args).Build();
 
-await using var scope = app.Services.CreateAsyncScope();
-await using var db = scope.ServiceProvider.GetService<DBContext>();
-await db.Database.MigrateAsync();
+        RunMigrations(app);
 
-app.Run();
+        app.Run();
+    }
+    // Calls the startup class and creates the webinterface
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        WebHost.CreateDefaultBuilder(args)
+                .UseUrls("0.0.0.0:5000")
+                .UseStartup<Startup>();
+
+    public static async void RunMigrations(IWebHost app)
+    {
+        await using var scope = app.Services.CreateAsyncScope();
+        await using var db = scope.ServiceProvider.GetService<DbContext>();
+        await db.Database.MigrateAsync();
+    }
+}
+
 

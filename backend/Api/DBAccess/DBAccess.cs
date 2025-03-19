@@ -120,6 +120,8 @@ namespace Api.DBAccess
 
             device1.ReferenceId = device.ReferenceId;
 
+            device1.Name = device.Name;
+
             return await _context.SaveChangesAsync() == 1;
         }
 

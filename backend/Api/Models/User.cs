@@ -10,7 +10,7 @@
 
         public string Email { get; set; }
 
-        public string Salt { get; set; }
+        public string? Salt { get; set; }
 
         public List<Device>? Devices { get; set; }
     }
