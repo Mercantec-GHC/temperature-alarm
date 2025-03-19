@@ -1,0 +1,45 @@
+body {font-family: Arial, Helvetica, sans-serif;}
+
+.container{
+    display: flex;
+    justify-content: center;
+}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Set a style for all buttons */
+button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+img.avatar {
+  width: 40%;
+  border-radius: 50%;
+}
+
+.form-container {
+  padding: 16px;
+}
+
+.registerText{
+    display: flex;
+    justify-content: space-between;
+}

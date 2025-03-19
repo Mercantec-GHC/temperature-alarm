@@ -26,3 +26,44 @@ body {
     background-color: #04AA6D;
     color: white;
   }
+
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+
+  .tempHigh{
+    color: #ff0000;
+    width: 20px;
+  }
+
+  .tempMidHigh{
+    color: #fffb00;
+    width: 20px;
+  }
+
+  .tempNormal{
+    color: #02ed26;
+    width: 20px;
+  }
+
+  .tempMidLow{
+    color: #16fae7 ;
+    width: 20px;
+  }
+
+  .tempLow{
+    color: #0004ff;
+    width: 20px;
+  }
