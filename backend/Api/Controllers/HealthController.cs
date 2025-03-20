@@ -3,10 +3,10 @@
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class HealthController : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> Heath() { return Ok(); }
+        public async Task<IActionResult> Health() { return Ok(); }
     }
 }
