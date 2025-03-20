@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
         private readonly DBContext _context;
@@ -23,10 +23,10 @@ namespace Api.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] User user)
+        public async Task<IActionResult> Login([FromBody] Login login)
         {
             DbAccess dBAccess = new DbAccess(_context);
-            user = await dBAccess.Login(user);
+            var user = await dBAccess.Login(login);
             if (user.Id == 0) { return Unauthorized(new { error = "Invalid username or password" }); }
             var token = GenerateJwtToken(user);
             return Ok(new { token, user.UserName, user.Id });

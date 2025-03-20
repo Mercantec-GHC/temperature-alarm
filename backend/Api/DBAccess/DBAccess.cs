@@ -41,19 +41,25 @@ namespace Api.DBAccess
             return await _context.SaveChangesAsync() == 1;
         }
 
-        public async Task<User> Login(User user)
+        public async Task<User> Login(Login login)
         {
-            var profile = await _context.Users.FirstAsync(u => u.UserName == user.UserName);
-            if (profile == null)
+            User user = new User();
+            if (!login.EmailOrUsrn.Contains("@"))
             {
-                profile = await _context.Users.FirstAsync(u => u.Email == user.Email);
+                user = await _context.Users.FirstAsync(u => u.UserName == login.EmailOrUsrn);
+            }
+            else
+            {
+                user = await _context.Users.FirstAsync(u => u.Email == login.EmailOrUsrn);
             }
 
-            string hashedPassword = ComputeHash(user.Password, SHA256.Create(), profile.Salt);
+            if (user == null) { return new User(); }
+
+            string hashedPassword = ComputeHash(user.Password, SHA256.Create(), user.Salt);
 
             if (hashedPassword == user.Password)
             {
-                return profile;
+                return user;
             }
             return new User();
         }

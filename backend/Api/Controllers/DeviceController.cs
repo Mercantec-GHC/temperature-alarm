@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class DeviceController : Controller
     {
         private readonly DBContext _context;
