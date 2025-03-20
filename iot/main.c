@@ -10,12 +10,12 @@
 
 void *watch_temperature(void *arg)
 {
-	init_temperature();
+	temperature_handle_t temp_handle = init_temperature();
 
-	get_temperature();
+	get_temperature(temp_handle);
 
 	while (true) {
-		double temperature = get_temperature();
+		double temperature = get_temperature(temp_handle);
 
 		char *str = malloc(snprintf(NULL, 0, "%lf", temperature) + 1);
 		sprintf(str, "%lf", temperature);

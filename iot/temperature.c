@@ -9,6 +9,8 @@
 #include <string.h>
 #include <sys/ioctl.h>
 
+#include "temperature.h"
+
 #define MPC9808_BUS	"/dev/i2c-2"
 #define MPC9808_ADR	0x18
 
@@ -21,14 +23,12 @@
 #define DEVID_REG  0x07
 #define RES_REG    0x08
 
-int file;
-
 uint8_t get_byte_in_integer(int num, int n)
 {
 	return (num >> (8*n)) & 0xff;
 }
 
-double get_temperature()
+double get_temperature(temperature_handle_t file)
 {
 	double temperature;
 	int32_t reg32;
@@ -51,9 +51,10 @@ double get_temperature()
 	return temperature;
 }
 
-void init_temperature(void)
+temperature_handle_t init_temperature(void)
 {
-	file = open(MPC9808_BUS, O_RDWR);
+	int file = open(MPC9808_BUS, O_RDWR);
+
 	if (file < 0) {
 		fprintf(stderr, "Error opening temperature sensor device (%s): %s\n", MPC9808_BUS, strerror(errno));
 		exit(1);
@@ -71,24 +72,26 @@ void init_temperature(void)
 	// Read manufactorer ID
 	reg32 = i2c_smbus_read_word_data(file, MANID_REG);
 
-	if ( reg32 < 0 ) {
+	if (reg32 < 0) {
 			fprintf(stderr, "ERROR: Read failed  on i2c bus register %d - %s\n",  MANID_REG,strerror(errno));
 			exit(1);
 	}
 	if (bswap_16(reg16poi[0]) != 0x0054) {
-			fprintf(stderr, "Manufactorer ID wrong is 0x%x should be 0x54\n",__bswap_16(reg16poi[0]));
-			exit(1);
+		fprintf(stderr, "Manufactorer ID wrong is 0x%x should be 0x54\n",__bswap_16(reg16poi[0]));
+		exit(1);
 	}
 
 	// Read device ID and revision
 	reg32 = i2c_smbus_read_word_data(file, DEVID_REG);
 	if (reg32 < 0) {
-			fprintf(stderr, "ERROR: Read failed  on i2c bus register %d - %s\n",  DEVID_REG,strerror(errno) );
-			exit(1);
+		fprintf(stderr, "ERROR: Read failed  on i2c bus register %d - %s\n",  DEVID_REG,strerror(errno) );
+		exit(1);
 	}
 	if (reg8poi[0] != 0x04) {
-			fprintf(stderr, "Manufactorer ID OK but device ID wrong is 0x%x should be 0x4\n",reg8poi[0]);
-			exit(1);
+		fprintf(stderr, "Manufactorer ID OK but device ID wrong is 0x%x should be 0x4\n",reg8poi[0]);
+		exit(1);
 	}
+
+	return file;
 }
 
