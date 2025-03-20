@@ -26,6 +26,7 @@ namespace Api
                             options.UseSqlite(_configuration.GetConnectionString("Database")));
 
             services.AddScoped<DbAccess>();
+            services.AddScoped<DeviceLogic>();
             services.AddScoped<UserLogic>();
 
             services.AddControllers();
