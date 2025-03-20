@@ -1,10 +1,11 @@
-const address = "http://10.135.51.116/temperature-alarm-webapi/users"
+import { address } from "../../shared/constants";
+
 
 export function login(usernameOrEmail, password) {
     console.log(usernameOrEmail);
     console.log(password);
 
-    fetch(`${address}/login`, {
+    fetch(`${address}/user/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -17,7 +18,7 @@ export function login(usernameOrEmail, password) {
 }
 
 export function create(email, username, password, repeatPassword){
-    fetch(`${address}/create`, {
+    fetch(`${address}/user/create`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -29,8 +30,8 @@ export function create(email, username, password, repeatPassword){
     .catch(error => console.error("Error:", error));
 }
 
-export function update(email, username, password){
-    fetch(`${address}/update`, {
+ function update(email, username, password){
+    fetch(`${address}/user/update`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"

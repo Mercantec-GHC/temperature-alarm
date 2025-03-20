@@ -1,4 +1,4 @@
-import { mockTemperatureLogs } from "../../mockdata/temperature-logs.mockdata.js"; // Import data
+import { mockTemperatureLogs } from "../mockdata/temperature-logs.mockdata.js"; // Import data
 
 const xValues = mockTemperatureLogs.map((log) =>
   new Date(log.date).toLocaleString()
