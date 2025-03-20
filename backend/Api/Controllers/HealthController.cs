@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Api.DBAccess;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
@@ -6,7 +7,17 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class HealthController : Controller
     {
-        [HttpGet]
-        public async Task<IActionResult> Health() { return Ok(); }
+        private readonly DbAccess _dbAccess;
+
+        public HealthController(DbAccess dbAccess)
+        {
+            _dbAccess = dbAccess;
+        }
+
+        [HttpGet("API")]
+        public async Task<IActionResult> HealthAPI() { return Ok(true); }
+
+        [HttpGet("DB")]
+        public async Task<IActionResult> HealthDB() { return Ok(_dbAccess.Test()); }
     }
 }

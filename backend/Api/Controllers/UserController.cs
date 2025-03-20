@@ -13,21 +13,20 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class UserController : Controller
     {
-        private readonly DBContext _context;
+        private readonly DbAccess _dbAccess;
         private readonly IConfiguration _configuration;
 
-        public UserController(DBContext context, IConfiguration configuration)
+        public UserController(IConfiguration configuration, DbAccess dbAccess)
         {
-            _context = context;
+            _dbAccess = dbAccess;
             _configuration = configuration;
         }
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            var user = await dBAccess.Login(login);
-            if (user.Id == 0) { return Unauthorized(new { error = "Invalid username or password" }); }
+            User user = await _dbAccess.Login(login);
+            if (user == null || user.Id == 0) { return Unauthorized(new { error = "Invalid username or password" }); }
             var token = GenerateJwtToken(user);
             return Ok(new { token, user.UserName, user.Id });
         }
@@ -35,8 +34,7 @@ namespace Api.Controllers
         [HttpPost("Create")]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            bool success = await dBAccess.CreateUser(user);
+            bool success = await _dbAccess.CreateUser(user);
             if (!success) { return BadRequest(new { error = "User can't be created" }); }
             return Ok();
         }
@@ -45,8 +43,7 @@ namespace Api.Controllers
         [HttpPut("Edit/{userId}")]
         public async Task<IActionResult> EditUser([FromBody] User user, int userId)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            bool success = await dBAccess.UpdateUser(user, userId);
+            bool success = await _dbAccess.UpdateUser(user, userId);
             if (!success) { return BadRequest(new { error = "User can't be edited" }); }
             return Ok();
         }
@@ -55,8 +52,7 @@ namespace Api.Controllers
         [HttpDelete("Delete/{userId}")]
         public async Task<IActionResult> DeleteUser(int userId)
         {
-            DbAccess dbAccess = new DbAccess(_context);
-            bool success = await dbAccess.DeleteUser(userId);
+            bool success = await _dbAccess.DeleteUser(userId);
             if (!success) { return BadRequest(new { error = "User can't be deleted" }); }
             return Ok();
         }

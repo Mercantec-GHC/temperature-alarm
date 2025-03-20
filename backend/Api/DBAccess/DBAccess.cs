@@ -46,11 +46,11 @@ namespace Api.DBAccess
             User user = new User();
             if (!login.EmailOrUsrn.Contains("@"))
             {
-                user = await _context.Users.FirstAsync(u => u.UserName == login.EmailOrUsrn);
+                user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == login.EmailOrUsrn);
             }
             else
             {
-                user = await _context.Users.FirstAsync(u => u.Email == login.EmailOrUsrn);
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Email == login.EmailOrUsrn);
             }
 
             if (user == null) { return new User(); }
@@ -66,7 +66,9 @@ namespace Api.DBAccess
 
         public async Task<bool> UpdateUser(User user, int userId)
         {
-            var profile = await _context.Users.FirstAsync(u => u.Id == userId);
+            var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (profile == null) { return false; }
 
             profile.UserName = user.UserName;
 
@@ -82,7 +84,7 @@ namespace Api.DBAccess
             var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
             if (user != null)
             {
-                if (user.Devices != null && user.Devices.Count > 0) 
+                if (user.Devices != null && user.Devices.Count > 0)
                 {
                     foreach (var item in user.Devices)
                     {
@@ -122,7 +124,7 @@ namespace Api.DBAccess
 
         public async Task<bool> UpdateDevice(Device device, int deviceId)
         {
-            var device1 = await _context.Devices.FirstAsync(u => u.Id == deviceId);
+            var device1 = await _context.Devices.FirstOrDefaultAsync(u => u.Id == deviceId);
 
             device1.TempLow = device.TempLow;
 
@@ -144,6 +146,11 @@ namespace Api.DBAccess
             var logs = device.Logs;
 
             return logs;
+        }
+
+        public async Task<bool> Test()
+        {
+            return _context.Database.CanConnect();
         }
 
         private static string ComputeHash(string input, HashAlgorithm algorithm, string salt)

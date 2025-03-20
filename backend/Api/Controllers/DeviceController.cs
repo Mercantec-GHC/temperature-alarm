@@ -9,19 +9,18 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class DeviceController : Controller
     {
-        private readonly DBContext _context;
+        private readonly DbAccess _dbAccess;
 
-        public DeviceController(DBContext context)
+        public DeviceController(DbAccess dbAccess)
         {
-            _context = context;
+            _dbAccess = dbAccess;
         }
 
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetDevices(int userId)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            List<Device> devices = await dBAccess.ReadDevices(userId);
+            List<Device> devices = await _dbAccess.ReadDevices(userId);
             if (devices.Count == 0) { return BadRequest(new { error = "There is no devices that belong to this userID" }); }
             return Ok(devices);
         }
@@ -30,8 +29,7 @@ namespace Api.Controllers
         [HttpPost("adddevice/{userId}")]
         public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            bool success = await dBAccess.CreateDevice(device, userId);
+            bool success = await _dbAccess.CreateDevice(device, userId);
             if (!success) { return BadRequest(new { error = "This device already exist" }); }
             return Ok();
         }
@@ -40,8 +38,7 @@ namespace Api.Controllers
         [HttpGet("logs/{deviceId}")]
         public async Task<IActionResult> GetLogs(int deviceId)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            List<TemperatureLogs> logs = await dBAccess.ReadLogs(deviceId);
+            List<TemperatureLogs> logs = await _dbAccess.ReadLogs(deviceId);
             if (logs.Count == 0) { return BadRequest(new { error = "There is no logs that belong to this deviceId" }); }
             return Ok(logs);
         }
@@ -50,8 +47,7 @@ namespace Api.Controllers
         [HttpPut("Edit/{deviceId}")]
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
         {
-            DbAccess dBAccess = new DbAccess(_context);
-            bool success = await dBAccess.UpdateDevice(device, deviceId);
+            bool success = await _dbAccess.UpdateDevice(device, deviceId);
             if (!success) { return BadRequest(new { error = "Device can't be edited" }); }
             return Ok();
         }

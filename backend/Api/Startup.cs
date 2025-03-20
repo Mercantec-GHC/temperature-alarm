@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Api.DBAccess;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -22,7 +23,9 @@ namespace Api
             // Sets the connectionstring to the database so dbcontext can find it
             services.AddDbContext<DBContext>(options =>
                             options.UseSqlite(_configuration.GetConnectionString("Database")));
-            
+
+            services.AddScoped<DbAccess>();
+
             services.AddControllers();
 
             services.AddAuthentication(x =>
