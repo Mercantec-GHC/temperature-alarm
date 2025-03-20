@@ -1,5 +1,4 @@
-import { address } from "../../shared/constants";
-
+import { address } from "../../shared/constants.js";
 
 export function login(usernameOrEmail, password) {
     console.log(usernameOrEmail);
