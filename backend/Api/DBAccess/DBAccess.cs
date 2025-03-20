@@ -44,7 +44,11 @@ namespace Api.DBAccess
         public async Task<User> Login(User user)
         {
             var profile = await _context.Users.FirstAsync(u => u.UserName == user.UserName);
-            
+            if (profile == null)
+            {
+                profile = await _context.Users.FirstAsync(u => u.Email == user.Email);
+            }
+
             string hashedPassword = ComputeHash(user.Password, SHA256.Create(), profile.Salt);
 
             if (hashedPassword == user.Password)

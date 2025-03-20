@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers
 {
@@ -40,6 +41,7 @@ namespace Api.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPut("Edit/{userId}")]
         public async Task<IActionResult> EditUser([FromBody] User user, int userId)
         {
@@ -49,6 +51,7 @@ namespace Api.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete("Delete/{userId}")]
         public async Task<IActionResult> DeleteUser(int userId)
         {

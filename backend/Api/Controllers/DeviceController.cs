@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Api.Models;
 using Api.DBAccess;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers
 {
@@ -15,7 +16,7 @@ namespace Api.Controllers
             _context = context;
         }
 
-        // For at få json webtokens til at virke skriv [Authorize] over de endpoints
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetDevices(int userId)
         {
@@ -25,6 +26,7 @@ namespace Api.Controllers
             return Ok(devices);
         }
 
+        [Authorize]
         [HttpPost("adddevice/{userId}")]
         public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
         {
@@ -34,6 +36,7 @@ namespace Api.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet("logs/{deviceId}")]
         public async Task<IActionResult> GetLogs(int deviceId)
         {
@@ -43,6 +46,7 @@ namespace Api.Controllers
             return Ok(logs);
         }
 
+        [Authorize]
         [HttpPut("Edit/{deviceId}")]
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
         {
