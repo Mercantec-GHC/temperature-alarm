@@ -22,7 +22,7 @@ class Program
     public static async void RunMigrations(IWebHost app)
     {
         await using var scope = app.Services.CreateAsyncScope();
-        await using var db = scope.ServiceProvider.GetService<DbContext>();
+        await using var db = scope.ServiceProvider.GetService<DBContext>();
 
         if (db != null) {
             await db.Database.MigrateAsync();

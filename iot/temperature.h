@@ -1,4 +1,6 @@
-void init_temperature();
+typedef int temperature_handle_t;
 
-double get_temperature();
+temperature_handle_t init_temperature();
+
+double get_temperature(temperature_handle_t handle);
 
