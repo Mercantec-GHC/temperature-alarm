@@ -2,6 +2,7 @@
 using Api.Models;
 using Api.DBAccess;
 using Microsoft.AspNetCore.Authorization;
+using Api.BusinessLogic;
 
 namespace Api.Controllers
 {
@@ -10,10 +11,12 @@ namespace Api.Controllers
     public class DeviceController : Controller
     {
         private readonly DbAccess _dbAccess;
+        private readonly DeviceLogic _deviceLogic;
 
-        public DeviceController(DbAccess dbAccess)
+        public DeviceController(DbAccess dbAccess, DeviceLogic deviceLogic)
         {
             _dbAccess = dbAccess;
+            _deviceLogic = deviceLogic;
         }
 
         [Authorize]
@@ -22,34 +25,28 @@ namespace Api.Controllers
         {
             List<Device> devices = await _dbAccess.ReadDevices(userId);
             if (devices.Count == 0) { return BadRequest(new { error = "There is no devices that belong to this userID" }); }
-            return Ok(devices);
+            return await _deviceLogic.GetDevices(userId);
         }
 
         [Authorize]
         [HttpPost("adddevice/{userId}")]
         public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
         {
-            bool success = await _dbAccess.CreateDevice(device, userId);
-            if (!success) { return BadRequest(new { error = "This device already exist" }); }
-            return Ok();
+            return await _deviceLogic.AddDevice(device, userId);
         }
 
         [Authorize]
         [HttpGet("logs/{deviceId}")]
         public async Task<IActionResult> GetLogs(int deviceId)
         {
-            List<TemperatureLogs> logs = await _dbAccess.ReadLogs(deviceId);
-            if (logs.Count == 0) { return BadRequest(new { error = "There is no logs that belong to this deviceId" }); }
-            return Ok(logs);
+            return await _deviceLogic.GetLogs(deviceId);
         }
 
         [Authorize]
         [HttpPut("Edit/{deviceId}")]
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
         {
-            bool success = await _dbAccess.UpdateDevice(device, deviceId);
-            if (!success) { return BadRequest(new { error = "Device can't be edited" }); }
-            return Ok();
+            return await _deviceLogic.EditDevice(device, deviceId);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Api.DBAccess;
+﻿using Api.BusinessLogic;
+using Api.DBAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +26,7 @@ namespace Api
                             options.UseSqlite(_configuration.GetConnectionString("Database")));
 
             services.AddScoped<DbAccess>();
+            services.AddScoped<UserLogic>();
 
             services.AddControllers();
 
