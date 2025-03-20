@@ -6,6 +6,7 @@ BASEPATH=/home/developers/temperature-alarm
 git -C $BASEPATH pull
 
 # Update frontend
+rm -r /var/www/html/*
 cp $BASEPATH/frontend/* -r /var/www/html
 chown www-data:www-data -R /var/www/html
 
