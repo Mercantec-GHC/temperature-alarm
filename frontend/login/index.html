@@ -4,33 +4,33 @@
         <meta charset="UTF-8" />
         <title>Login - Temperature alarm</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/styles/login.css">
+        <link rel="stylesheet" href="/styles/auth.css">
         <script defer type="module" src="/scripts/login.js"></script>
     </head>
     <body>
-        <div class="container">
-            <form id="loginForm">
-                <div class="form-container">
-                    <h1>Login</h1>
+        <form id="loginForm">
+            <div class="form-container">
+                <h1>Login</h1>
 
-                    <label for="emailorusn"><b>Email or Username</b></label>
-                    <input type="text" placeholder="Enter email or username" id="emailorusn" required>
+                <label for="emailorusn"><b>Email or Username</b></label>
+                <input type="text" placeholder="Enter email or username" id="emailorusn" required>
 
-                    <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter password" id="psw" required>
+                <label for="psw"><b>Password</b></label>
+                <input type="password" placeholder="Enter password" id="psw" required>
 
-                    <button type="submit">Login</button>
-                    <div class="registerText">
-                        <label>
-                            <input type="checkbox" name="remember"> Remember me
-                        </label>
-                        <p>
+                <button type="submit">Login</button>
+                <div class="details">
+                    <label>
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <span>
                         Dont have an account? <a href="/register">Register</a>
-                        </p>
-                    </div>
+                    </span>
                 </div>
-            </form>
-        </div>
+
+                <div id="form-error"></div>
+            </div>
+        </form>
     </body>
 </html>
 
