@@ -36,8 +36,11 @@ namespace Api.DBAccess
             }
 
             _context.Users.Add(user);
-            
-            return new OkObjectResult(await _context.SaveChangesAsync());
+            bool saved = await _context.SaveChangesAsync() == 1;
+
+            if (saved) { return new OkObjectResult(true); }
+
+            return new ConflictObjectResult(new { message = "Could not save to databse" });
         }
 
         public async Task<User> Login(Login login)
@@ -108,7 +111,7 @@ namespace Api.DBAccess
                     }
                 }
                 _context.Users.Remove(user);
-                bool saved = await _context.SaveChangesAsync() == 1;
+                bool saved = await _context.SaveChangesAsync() >= 0;
 
                 if (saved) { return new OkObjectResult(saved); }
 
