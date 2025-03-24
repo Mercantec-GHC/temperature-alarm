@@ -28,13 +28,25 @@ export function create(email, username, password, repeatPassword){
     .catch(err => { error: err.message });
 }
 
-function update(email, username, password){
+export function update(email, username){
     return fetch(`${address}/user/update`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({email: email, username: username, password: password})
+        body: JSON.stringify({email: email, username: username})
+    })
+    .then(handleResponse)
+    .catch(err => { error: err.message });
+}
+
+export function updatePassword(oldPassword, newPassword){
+    return fetch(`${address}/user/update-password`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({oldPassword: oldPassword, newPassword: newPassword})
     })
     .then(handleResponse)
     .catch(err => { error: err.message });
