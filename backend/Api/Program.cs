@@ -1,4 +1,5 @@
 using Api;
+using Api.DBAccess;
 using Api.MQTTReciever;
 using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,20 @@ class Program
         MQTTReciever mqtt = new MQTTReciever(configuration);
         mqtt.Handle_Received_Application_Message();
         RunMigrations(app);
+
+        Task.Run(() =>
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var configuration = services.GetRequiredService<IConfiguration>();
+                var dbAccess = services.GetRequiredService<DbAccess>();
+
+                MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
+                mqtt.Handle_Received_Application_Message().Wait();
+            }
+        });
+
 
         app.Run();
     }

@@ -1,7 +1,9 @@
 ﻿using Api.DBAccess;
+using Api.Models;
 using MQTTnet;
 using MQTTnet.Extensions.TopicTemplate;
 using System.Text;
+using System.Text.Json;
 
 
 namespace Api.MQTTReciever
@@ -10,9 +12,11 @@ namespace Api.MQTTReciever
     {
         IMqttClient mqttClient;
         private readonly IConfiguration _configuration;
+        private readonly DbAccess _dbAccess;
 
-        public MQTTReciever(IConfiguration configuration)
+        public MQTTReciever(IConfiguration configuration, DbAccess dbAccess)
         {
+            _dbAccess = dbAccess;
             _configuration = configuration;
         }
 
@@ -35,6 +39,28 @@ namespace Api.MQTTReciever
                 mqttClient.ApplicationMessageReceivedAsync += e =>
                 {
                     Console.WriteLine("Received application message.");
+
+                    string sensorData = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+
+                    var mqttMessageReceive = JsonSerializer.Deserialize<MQTTMessageReceive>(sensorData);
+
+                    if (mqttMessageReceive == null || mqttMessageReceive.temperature == 0 || mqttMessageReceive.device_id == null || mqttMessageReceive.timestamp == null)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    TemperatureLogs newLog = new TemperatureLogs();
+                    string refernceId = mqttMessageReceive.device_id;
+                    var device = _dbAccess.ReadDevice(refernceId);
+
+                    if (device == null) { return Task.CompletedTask; }
+
+                    newLog.Temperature = mqttMessageReceive.temperature;
+                    newLog.Date = DateTimeOffset.FromUnixTimeSeconds(mqttMessageReceive.timestamp).DateTime;
+                    newLog.TempHigh = device.TempHigh;
+                    newLog.TempLow = device.TempLow;
+
+                    _dbAccess.CreateLog(newLog, refernceId);
 
                     return Task.CompletedTask;
                 };
