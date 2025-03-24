@@ -11,9 +11,8 @@ class Program
     public static void Main(string[] args)
     {
         var app = CreateWebHostBuilder(args).Build();
-        var configuration = app.Services.GetRequiredService<IConfiguration>();
-        MQTTReciever mqtt = new MQTTReciever(configuration);
-        mqtt.Handle_Received_Application_Message();
+
+
         RunMigrations(app);
 
         Task.Run(() =>
