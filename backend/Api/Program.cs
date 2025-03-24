@@ -10,18 +10,21 @@ class Program
     {
         var app = CreateWebHostBuilder(args).Build();
 
-
-        using (var scope = app.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            var configuration = services.GetRequiredService<IConfiguration>();
-            var dbAccess = services.GetRequiredService<DbAccess>();
-
-            MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
-            mqtt.Handle_Received_Application_Message();
-        }
-
         RunMigrations(app);
+
+        Task.Run(() =>
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var configuration = services.GetRequiredService<IConfiguration>();
+                var dbAccess = services.GetRequiredService<DbAccess>();
+
+                MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
+                mqtt.Handle_Received_Application_Message().Wait();
+            }
+        });
+
 
         app.Run();
     }

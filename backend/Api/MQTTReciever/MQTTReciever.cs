@@ -52,9 +52,11 @@ namespace Api.MQTTReciever
                     string refernceId = mqttMessageReceive.device_id;
                     var device = _dbAccess.ReadDevice(refernceId);
 
+                    if (device == null) { return Task.CompletedTask; }
+
                     newLog.Temperature = mqttMessageReceive.temperature;
                     newLog.Date = DateTimeOffset.FromUnixTimeSeconds(mqttMessageReceive.timestamp).DateTime;
-                    newLog.TempHigh= device.TempHigh;
+                    newLog.TempHigh = device.TempHigh;
                     newLog.TempLow = device.TempLow;
 
                     _dbAccess.CreateLog(newLog, refernceId);
