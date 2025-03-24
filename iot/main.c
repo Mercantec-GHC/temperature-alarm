@@ -22,9 +22,16 @@ void *watch_temperature(void *arg)
 
 	while (true) {
 		double temperature = get_temperature(temp_handle);
+		size_t timestamp = time(NULL);
 
-		char *str = malloc(snprintf(NULL, 0, "%lf", temperature) + 1);
-		sprintf(str, "%lf", temperature);
+		char *format = "{"
+			"\"temperature\": %lf,"
+			"\"device_id\": \"%s\","
+			"\"timestamp\": %zu"
+		"}";
+
+		char *str = malloc(snprintf(NULL, 0, format, temperature, device_id, timestamp) + 1);
+		sprintf(str, format, temperature, device_id, timestamp);
 
 		mqtt_send_message("temperature", str);
 
