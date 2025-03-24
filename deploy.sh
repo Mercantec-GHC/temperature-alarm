@@ -1,4 +1,4 @@
-#!/usr/bin
+#!/bin/sh
 
 BASEPATH=/home/developers/temperature-alarm
 
@@ -13,5 +13,5 @@ chown www-data:www-data -R /var/www/html
 # Update backend
 docker stop api
 docker build --tag api $BASEPATH/backend/Api
-docker run -d -p 8080:80 -p 8081:443 -p 5000:5000 --name api --rm api
+docker run -d -p 5000:5000 --name api --rm api
 
