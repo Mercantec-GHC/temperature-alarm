@@ -1,4 +1,6 @@
 using Api;
+using Api.DBAccess;
+using Api.MQTTReciever;
 using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +9,17 @@ class Program
     public static void Main(string[] args)
     {
         var app = CreateWebHostBuilder(args).Build();
+
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var configuration = services.GetRequiredService<IConfiguration>();
+            var dbAccess = services.GetRequiredService<DbAccess>();
+
+            MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
+            mqtt.Handle_Received_Application_Message();
+        }
 
         RunMigrations(app);
 

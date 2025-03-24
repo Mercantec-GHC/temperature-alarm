@@ -150,6 +150,10 @@ namespace Api.DBAccess
             return await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
         }
 
+        public Device ReadDevice(string refenreId)
+        {
+            return _context.Devices.FirstOrDefault(d => d.ReferenceId == refenreId);
+        }
 
         public async Task<IActionResult> UpdateDevice(Device device, int deviceId)
         {
@@ -181,6 +185,18 @@ namespace Api.DBAccess
             var logs = device.Logs;
 
             return logs;
+        }
+
+        public async void CreateLog(TemperatureLogs temperatureLogs, string referenceId)
+        {
+            var device = await _context.Devices.Include(d => d.Logs).FirstOrDefaultAsync(d => d.ReferenceId == referenceId);
+
+            if (device == null) { return; }
+
+            if (device.Logs == null) { device.Logs = new List<TemperatureLogs>(); }
+
+            device.Logs.Add(temperatureLogs);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> Test()

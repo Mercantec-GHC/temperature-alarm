@@ -28,21 +28,21 @@ namespace Api.Controllers
             return await _deviceLogic.GetDevices(userId);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("adddevice/{userId}")]
         public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
         {
             return await _deviceLogic.AddDevice(device, userId);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("logs/{deviceId}")]
         public async Task<IActionResult> GetLogs(int deviceId)
         {
             return await _deviceLogic.GetLogs(deviceId);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPut("Edit/{deviceId}")]
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
         {
