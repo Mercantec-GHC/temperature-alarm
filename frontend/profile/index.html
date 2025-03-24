@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Register - Temperature Alarm</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/styles/auth.css">
+        <link rel="stylesheet" href="/styles/profile.css">
+        <script defer type="module" src="/scripts/profile.js"></script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="profileCard"></div>
+            <div class="btnContainer">
+                <button class="btn" id="openEditModal">Edit</button>
+                <button class="btn" id="openPasswordModal">Change Password</button>
+
+            </div>
+        </div>
+
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Edit Username or Email</h2>
+                <form id="editForm">
+                    <div class="form-container">
+                        <label for="email"><b>Email</b></label>
+                        <input type="email" placeholder="Enter email "id="email" required>
+        
+                        <label for="uname"><b>Username</b></label>
+                        <input type="text" placeholder="Enter username" id="uname" required>
+        
+                        <button type="submit">Save Changes</button>
+        
+                        <div class="error-text" id="form-error-edit"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="PasswordModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Change Password</h2>
+                <form id="PasswordForm">
+                    <div class="form-container">
+                        <label for="psw"><b>Old Password</b></label>
+                        <input type="password" placeholder="Enter your current password" id="oldpsw" required>
+    
+                        <label for="psw"><b>New Password</b></label>
+                        <input type="password" placeholder="Enter the new password" id="psw" required>
+        
+                        <label for="rpsw"><b>Repeat New Password</b></label>
+                        <input type="password" placeholder="Enter the new password again" id="rpsw" required>
+        
+                        <button type="submit">Change Password</button>
+        
+                        <div class="error-text" id="form-error-password"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
+
