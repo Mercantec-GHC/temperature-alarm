@@ -1,7 +1,6 @@
 ﻿using Api.DBAccess;
 using Api.Models;
 using MQTTnet;
-using MQTTnet.Extensions.TopicTemplate;
 using System.Text;
 using System.Text.Json;
 
