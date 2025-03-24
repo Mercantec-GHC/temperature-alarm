@@ -3,6 +3,8 @@ using Api.Models;
 using System.Text;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Api.DBAccess
@@ -16,29 +18,26 @@ namespace Api.DBAccess
             _context = context;
         }
 
-        public async Task<bool> CreateUser(User user)
+        public async Task<IActionResult> CreateUser(User user)
         {
             var users = await _context.Users.ToListAsync();
 
             foreach (var item in users)
             {
-                if (item.UserName == user.UserName || item.Email == user.Email)
+                if (item.UserName == user.UserName)
                 {
-                    return false;
+                    return new ConflictObjectResult(new { message = "Username is already in use." });
+                }
+
+                if (item.Email == user.Email)
+                {
+                    return new ConflictObjectResult(new { message = "Email is being used already" });
                 }
             }
-            if (user.Devices == null)
-            {
-                user.Devices = new List<Device>();
-            }
-            string salt = Guid.NewGuid().ToString();
-            string hashedPassword = ComputeHash(user.Password, SHA256.Create(), salt);
-
-            user.Salt = salt;
-            user.Password = hashedPassword;
 
             _context.Users.Add(user);
-            return await _context.SaveChangesAsync() == 1;
+            
+            return new OkObjectResult(await _context.SaveChangesAsync());
         }
 
         public async Task<User> Login(Login login)
@@ -53,22 +52,34 @@ namespace Api.DBAccess
                 user = await _context.Users.FirstOrDefaultAsync(u => u.Email == login.EmailOrUsrn);
             }
 
-            if (user == null) { return new User(); }
-
-            string hashedPassword = ComputeHash(user.Password, SHA256.Create(), user.Salt);
-
-            if (hashedPassword == user.Password)
-            {
-                return user;
-            }
-            return new User();
+            if (user == null || user.Id == 0) { return new User(); }
+            return user;
         }
 
-        public async Task<bool> UpdateUser(User user, int userId)
+        public async Task<User> ReadUser(int userId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
+        public async Task<IActionResult> UpdateUser(User user, int userId)
         {
             var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var users = await _context.Users.ToListAsync();
 
-            if (profile == null) { return false; }
+            if (profile == null) { return new ConflictObjectResult(new { message = "User does not exist" }); }
+
+            foreach (var item in users)
+            {
+                if (item.UserName == user.UserName)
+                {
+                    return new ConflictObjectResult(new { message = "Username is already in use." });
+                }
+
+                if (item.Email == user.Email)
+                {
+                    return new ConflictObjectResult(new { message = "Email is being used already" });
+                }
+            }
 
             profile.UserName = user.UserName;
 
@@ -76,10 +87,14 @@ namespace Api.DBAccess
 
             profile.Password = user.Password;
 
-            return await _context.SaveChangesAsync() == 1;
+            bool saved = await _context.SaveChangesAsync() == 1;
+
+            if (saved) { return new OkObjectResult(profile); }
+
+            return new ConflictObjectResult(new { message = "Could not save to database" });
         }
 
-        public async Task<bool> DeleteUser(int userId)
+        public async Task<IActionResult> DeleteUser(int userId)
         {
             var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
             if (user != null)
@@ -93,9 +108,13 @@ namespace Api.DBAccess
                     }
                 }
                 _context.Users.Remove(user);
-                return await _context.SaveChangesAsync() == 1;
+                bool saved = await _context.SaveChangesAsync() == 1;
+
+                if (saved) { return new OkObjectResult(saved); }
+
+                return new ConflictObjectResult(new { message = "Could not save to database" });
             }
-            return false;
+            return new ConflictObjectResult(new { message = "Invalid user" });
         }
 
         public async Task<List<Device>> ReadDevices(int userId)
@@ -109,22 +128,34 @@ namespace Api.DBAccess
             return devices;
         }
 
-        public async Task<bool> CreateDevice(Device device, int userId)
+        public async Task<IActionResult> CreateDevice(Device device, int userId)
         {
             var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
 
-            if (user == null || user.Devices == null) { return false; }
+            if (user == null || user.Devices == null) { return new ConflictObjectResult(new { message = "User did not have a device list" }); }
 
             if (device.Logs == null) { device.Logs = new List<TemperatureLogs>(); }
 
             user.Devices.Add(device);
 
-            return await _context.SaveChangesAsync() == 1;
+            bool saved = await _context.SaveChangesAsync() == 1;
+
+            if (saved) { return new OkObjectResult(saved); }
+
+            return new ConflictObjectResult(new { message = "Could not save to database" });
         }
 
-        public async Task<bool> UpdateDevice(Device device, int deviceId)
+        public async Task<Device> ReadDevice(int deviceId)
+        {
+            return await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
+        }
+
+
+        public async Task<IActionResult> UpdateDevice(Device device, int deviceId)
         {
             var device1 = await _context.Devices.FirstOrDefaultAsync(u => u.Id == deviceId);
+
+            if (device1 == null) { return new ConflictObjectResult(new { message = "Device does not exist" }); }
 
             device1.TempLow = device.TempLow;
 
@@ -134,7 +165,11 @@ namespace Api.DBAccess
 
             device1.Name = device.Name;
 
-            return await _context.SaveChangesAsync() == 1;
+            bool saved = await _context.SaveChangesAsync() == 1;
+
+            if (saved) { return new OkObjectResult(device1); }
+
+            return new ConflictObjectResult(new { message = "Could not save to database" });
         }
 
         public async Task<List<TemperatureLogs>> ReadLogs(int deviceId)
@@ -153,19 +188,5 @@ namespace Api.DBAccess
             return _context.Database.CanConnect();
         }
 
-        private static string ComputeHash(string input, HashAlgorithm algorithm, string salt)
-        {
-            Byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-            Byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
-
-            // Combine salt and input bytes
-            Byte[] saltedInput = new Byte[saltBytes.Length + inputBytes.Length];
-            saltBytes.CopyTo(saltedInput, 0);
-            inputBytes.CopyTo(saltedInput, saltBytes.Length);
-
-            Byte[] hashedBytes = algorithm.ComputeHash(saltedInput);
-
-            return BitConverter.ToString(hashedBytes);
-        }
     }
 }
