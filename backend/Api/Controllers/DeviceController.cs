@@ -20,7 +20,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("{userId}")]
         public async Task<IActionResult> GetDevices(int userId)
         {
             List<Device> devices = await _dbAccess.ReadDevices(userId);
