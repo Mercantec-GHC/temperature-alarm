@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Poetsen One";
+    src: url("/fonts/PoetsenOne-Regular.ttf");
+}
+
 body {
     margin: 0;
     font-family: sans-serif;
@@ -14,16 +19,18 @@ main {
 }
 
 #logo {
-	height: 1em;
-	position: relative;
-	top: 5px;
-	filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.4));
+    height: 1em;
+    position: relative;
+    top: 5px;
+    filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.4));
 }
 
 h1 {
     margin: 0;
     font-size: 4rem;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+    font-family: "Poetsen One";
+    font-weight: normal;
 }
 
 #title {
