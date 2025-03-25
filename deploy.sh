@@ -12,6 +12,9 @@ chown www-data:www-data -R /var/www/html
 
 # Update backend
 docker stop api
+docker rm api
+docker image rm api:latest
+
 docker build --tag api $BASEPATH/backend/Api
-docker run -d -p 5000:5000 --name api --rm api
+docker run -d -p 5000:5000 --volume /home/developers/volume:/app/db --name api --rm api
 
