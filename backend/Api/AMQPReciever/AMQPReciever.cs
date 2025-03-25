@@ -67,8 +67,7 @@ namespace Api.AMQPReciever
 
             await channel.BasicConsumeAsync(queue, true, consumer);
 
-            Console.WriteLine("Press enter to exit.");
-            Console.ReadLine();
+			while (true);
         }
     }
 }
