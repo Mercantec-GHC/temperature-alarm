@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "mqtt.h"
+#include "brokers/amqp.h"
 #include "temperature.h"
 #include "device_id.h"
 
@@ -33,7 +33,7 @@ void *watch_temperature(void *arg)
 		char *str = malloc(snprintf(NULL, 0, format, temperature, device_id, timestamp) + 1);
 		sprintf(str, format, temperature, device_id, timestamp);
 
-		mqtt_send_message("temperature", str);
+		amqp_send_message("temperature-logs", str);
 
 		free(str);
 
@@ -47,7 +47,7 @@ void *watch_temperature(void *arg)
 	return NULL;
 }
 
-void mqtt_on_connect(void)
+void broker_on_connect(void)
 {
 	pthread_t temperature_thread;
 	pthread_create(&temperature_thread, NULL, watch_temperature, NULL);
@@ -57,7 +57,7 @@ int main(void)
 {
 	srand(time(NULL));
 
-	init_mqtt();
+	init_amqp();
 
 	return EXIT_SUCCESS;
 }
