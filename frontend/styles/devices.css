@@ -1,0 +1,28 @@
+table {
+    margin: 20px;
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td,
+  th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.addDeviceContainer{
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.addDevice{
+    width: 120px;
+    margin: 0 20px 0 0;
+}
