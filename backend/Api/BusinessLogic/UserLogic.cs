@@ -75,12 +75,6 @@ namespace Api.BusinessLogic
 
         public async Task<IActionResult> EditProfile(EditUserRequest userRequest, int userId)
         {
-            if (!new Regex(@".+@.+\..+").IsMatch(userRequest.Email))
-            {
-                return new ConflictObjectResult(new { message = "Invalid email address" });
-            }
-
-
             return await _dbAccess.UpdateUser(userRequest, userId);
         }
 

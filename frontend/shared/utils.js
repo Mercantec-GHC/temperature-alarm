@@ -10,3 +10,9 @@ export async function handleResponse(response) {
     return { error: "Request failed with HTTP code " + response.status };
 }
 
+document.querySelectorAll(".logoutContainer").forEach(closeBtn => {
+    closeBtn.onclick = () => {
+        localStorage.clear();
+        window.location.href = "/index.html";
+    };
+});

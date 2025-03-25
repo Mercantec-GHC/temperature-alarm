@@ -9,6 +9,7 @@ body {
   }
   
   .topnav a {
+    height: 20px;
     float: left;
     color: #f2f2f2;
     text-align: center;
@@ -17,15 +18,16 @@ body {
     font-size: 17px;
   }
   
-  .topnav a:hover {
+  .topnav a:hover, .topnav span:hover {
     background-color: #ddd;
     color: black;
-  }
-  
-  .topnav a.active {
+    cursor: pointer;
+}
+
+.topnav a.active {
     background-color: #04aa6d;
     color: white;
-  }
+}
 
 /* Full-width input fields */
 input[type=text], input[type=password], input[type=email] {
@@ -60,7 +62,7 @@ button:hover {
 
 .details {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-top: 0.5rem;
 }
 
@@ -72,5 +74,17 @@ button:hover {
     border-radius: 4px;
     padding: 1rem 2rem;
     margin-top: 1rem;
+}
+
+.logoutContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+}
+
+.logout{
+  width: 20px;
+  height: 24px;
 }
 

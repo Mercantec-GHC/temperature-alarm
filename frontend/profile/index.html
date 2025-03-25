@@ -7,14 +7,18 @@
         <link rel="stylesheet" href="/styles/auth.css">
         <link rel="stylesheet" href="/styles/profile.css">
         <script defer type="module" src="/scripts/profile.js"></script>
+        <script defer type="module" src="/shared/utils.js"></script>
     </head>
     <body>
         <div id="container">
             <div class="topnav">
-                <a class="active" href="/home/index.html">Home</a>
+                <a href="/home/index.html">Home</a>
+                <a href="/devices/index.html">Devices</a>
                 <div style="display: flex; justify-content: flex-end;">
-                  <a class="" href="/home/index.html">Devices</a>
-                  <a class="" href="/profile/index.html">Profile</a>
+                  <a class="active" href="/profile/index.html">Profile</a>
+                  <span class="logoutContainer">
+                    <img class="logout" src="/img/logout.png">
+                  </span>
                 </div>
               </div>
             <div id="profileCard"></div>
@@ -32,10 +36,10 @@
                 <form id="editForm">
                     <div class="form-container">
                         <label for="email"><b>Email</b></label>
-                        <input type="email" placeholder="Enter email "id="email" required>
+                        <input type="email" placeholder="Enter email "id="email">
         
                         <label for="uname"><b>Username</b></label>
-                        <input type="text" placeholder="Enter username" id="uname" required>
+                        <input type="text" placeholder="Enter username" id="uname">
         
                         <button type="submit">Save Changes</button>
         

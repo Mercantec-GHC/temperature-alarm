@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temperature-Alarm-Web</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <link rel="stylesheet" href="/styles/auth.css">
+    <link rel="stylesheet" href="/styles/devices.css" />
+    <script defer type="module" src="/scripts/devices.js"></script>
+    <script defer type="module" src="/shared/utils.js"></script>
+  </head>
+
+  <body>
+    <div id="container">
+        <div class="topnav">
+            <a href="/home/index.html">Home</a>
+            <a class="active" href="/devices/index.html">Devices</a>
+            <div style="display: flex; justify-content: flex-end;">
+              <a href="/profile/index.html">Profile</a>
+              <span class="logoutContainer">
+                <img class="logout" src="/img/logout.png">
+              </span>
+            </div>
+          </div>
+      <table>
+        <tr>
+          <th>Id</th>
+          <th>Placement</th>
+          <th>Latest Meassurement</th>
+        </tr>
+        <tbody id="deviceTable"></tbody>
+      </table>
+    </div>
+  </body>
+</html>

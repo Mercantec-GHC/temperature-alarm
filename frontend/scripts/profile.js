@@ -3,14 +3,8 @@ import { get } from "./services/users.service.js";
 import { update } from "./services/users.service.js";
 import { updatePassword } from "./services/users.service.js";
 
-let idlocation = localStorage.getItem("rememberLogin")
-let id;
-if(idlocation){
-    id = localStorage.getItem("id");
-}   
-else{
-    id = localStorage.getItem("id");
-}
+let id = localStorage.getItem("id");
+
 get(id).then(res => {
     var table = document.getElementById(`profileCard`);
 table.innerHTML += `
@@ -40,6 +34,8 @@ document.querySelectorAll(".close").forEach(closeBtn => {
     closeBtn.onclick = () => {
         pswModal.style.display = "none";
         editModal.style.display = "none";
+        document.getElementById("form-error").innerText = "";
+        document.getElementById("form-error").style.display = "none";
     };
 });
 

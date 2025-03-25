@@ -17,15 +17,7 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
             }
             else{
                 if (typeof(Storage) !== "undefined") {
-                    if(document.getElementById("rememberId").checked == true){
-                        localStorage.setItem("id", response.id);
-                        localStorage.setItem("rememberLogin", true);
-                    }
-                    else{
-                        localStorage.setItem("rememberLogin", false);
-                        sessionStorage.setItem("id", response.id);
-                    }
-                    
+                    localStorage.setItem("id", response.id);
                 }
             }
 

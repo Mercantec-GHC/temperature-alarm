@@ -91,9 +91,13 @@ namespace Api.DBAccess
                 }
             }
 
-            profile.UserName = user.UserName;
+            if(user.Email != "" && user.Email != null)
+                profile.Email = user.Email;
 
-            profile.Email = user.Email;
+            if (user.UserName != "" && user.UserName != null)
+                profile.UserName = user.UserName;
+
+
 
             bool saved = await _context.SaveChangesAsync() == 1;
 

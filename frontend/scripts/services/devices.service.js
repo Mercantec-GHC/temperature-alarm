@@ -1,12 +1,11 @@
-import { address } from "../../shared/constants";
+import { address } from "../../shared/constants.js";
 
-export function getDevicesOnUserId(id) {
-    fetch(`${address}/get-on-user-id`, {
+export function getDevicesOnUserId(userId) {
+    fetch(`${address}/device/${userId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ id: id })
     })
     .then(response => response.json())
     .then(data => console.log("Success:", data))
