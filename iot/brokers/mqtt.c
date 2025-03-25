@@ -3,11 +3,11 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "config.h"
+#include "../config.h"
 
 struct mosquitto *mosq;
 
-void mqtt_on_connect(void);
+void broker_on_connect(void);
 
 void on_connect(struct mosquitto *client, void *obj, int rc)
 {
@@ -18,7 +18,7 @@ void on_connect(struct mosquitto *client, void *obj, int rc)
 
 	puts("Connected to " MQTT_IP);
 
-	mqtt_on_connect();
+	broker_on_connect();
 }
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
