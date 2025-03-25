@@ -27,7 +27,7 @@ namespace Api.MQTTReciever
             using (mqttClient = mqttFactory.CreateMqttClient())
             {
                 var mqttClientOptions = new MqttClientOptionsBuilder()
-                    .WithTcpServer($"{_configuration["MQTT:host"]}", 1883)
+                    .WithTcpServer($"{_configuration["MQTT:host"]}", Convert.ToInt32(_configuration["MQTT:port"]))
                     .WithCredentials($"{_configuration["MQTT:username"]}", $"{_configuration["MQTT:password"]}")
                     .WithCleanSession()
                     .Build();
