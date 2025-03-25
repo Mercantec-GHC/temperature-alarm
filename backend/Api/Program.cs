@@ -1,4 +1,5 @@
 using Api;
+using Api.AMQPReciever;
 using Api.DBAccess;
 using Api.MQTTReciever;
 using Microsoft.AspNetCore;
@@ -22,6 +23,9 @@ class Program
                 var services = scope.ServiceProvider;
                 var configuration = services.GetRequiredService<IConfiguration>();
                 var dbAccess = services.GetRequiredService<DbAccess>();
+
+                //AMQPReciever amqp = new AMQPReciever(configuration, dbAccess);
+                //amqp.Handle_Received_Application_Message().Wait();
 
                 MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
                 mqtt.Handle_Received_Application_Message().Wait();
