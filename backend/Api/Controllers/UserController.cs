@@ -33,14 +33,14 @@ namespace Api.Controllers
             return await _userLogic.RegisterUser(user);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPut("Edit/{userId}")]
         public async Task<IActionResult> EditUser([FromBody] User user, int userId)
         {
             return await _userLogic.EditProfile(user, userId);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpDelete("Delete/{userId}")]
         public async Task<IActionResult> DeleteUser(int userId)
         {

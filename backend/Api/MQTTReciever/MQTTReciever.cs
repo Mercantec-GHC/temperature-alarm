@@ -43,7 +43,7 @@ namespace Api.MQTTReciever
 
                     var mqttMessageReceive = JsonSerializer.Deserialize<MQTTMessageReceive>(sensorData);
 
-                    if (mqttMessageReceive == null || mqttMessageReceive.temperature == 0 || mqttMessageReceive.device_id == null || mqttMessageReceive.timestamp == null)
+                    if (mqttMessageReceive == null || mqttMessageReceive.temperature == 0 || mqttMessageReceive.device_id == null || mqttMessageReceive.timestamp == 0)
                     {
                         return Task.CompletedTask;
                     }
