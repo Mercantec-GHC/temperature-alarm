@@ -5,6 +5,7 @@ using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Api.Models.User;
 
 
 namespace Api.DBAccess
@@ -17,6 +18,12 @@ namespace Api.DBAccess
         {
             _context = context;
         }
+
+        public async Task<User> getUser(int userId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
 
         public async Task<IActionResult> CreateUser(User user)
         {
@@ -64,7 +71,7 @@ namespace Api.DBAccess
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
-        public async Task<IActionResult> UpdateUser(User user, int userId)
+        public async Task<IActionResult> UpdateUser(EditUserRequest user, int userId)
         {
             var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var users = await _context.Users.ToListAsync();
@@ -73,12 +80,12 @@ namespace Api.DBAccess
 
             foreach (var item in users)
             {
-                if (item.UserName == user.UserName)
+                if (item.UserName == user.UserName && userId != item.Id)
                 {
                     return new ConflictObjectResult(new { message = "Username is already in use." });
                 }
 
-                if (item.Email == user.Email)
+                if (item.Email == user.Email && userId != item.Id)
                 {
                     return new ConflictObjectResult(new { message = "Email is being used already" });
                 }
@@ -88,7 +95,20 @@ namespace Api.DBAccess
 
             profile.Email = user.Email;
 
-            profile.Password = user.Password;
+            bool saved = await _context.SaveChangesAsync() == 1;
+
+            if (saved) { return new OkObjectResult(profile); }
+
+            return new ConflictObjectResult(new { message = "Could not save to database" });
+        }
+
+        public async Task<IActionResult> updatePassword(string newPassword, int userId)
+        {
+            var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (profile == null) { return new ConflictObjectResult(new { message = "User does not exist" }); }
+
+            profile.Password = newPassword;
 
             bool saved = await _context.SaveChangesAsync() == 1;
 

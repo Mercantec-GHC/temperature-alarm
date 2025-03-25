@@ -1,6 +1,18 @@
 import { address } from "../../shared/constants.js";
 import { handleResponse } from "../../shared/utils.js";
 
+
+export function get(userId) {
+    return fetch(`${address}/user/${userId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        },
+    })
+    .then(handleResponse)
+    .catch(err => { error: err.message });
+}
+
 export function login(usernameOrEmail, password) {
     return fetch(`${address}/user/login`, {
         method: "POST",
@@ -28,9 +40,9 @@ export function create(email, username, password, repeatPassword){
     .catch(err => { error: err.message });
 }
 
-export function update(email, username){
-    return fetch(`${address}/user/update`, {
-        method: "PATCH",
+export function update(email, username, userId){
+    return fetch(`${address}/user/edit/${userId}`, {
+        method: "PUT",
         headers: {
             "Content-Type": "application/json"
         },
@@ -40,9 +52,9 @@ export function update(email, username){
     .catch(err => { error: err.message });
 }
 
-export function updatePassword(oldPassword, newPassword){
-    return fetch(`${address}/user/update-password`, {
-        method: "PATCH",
+export function updatePassword(oldPassword, newPassword, userId){
+    return fetch(`${address}/user/change-password/${userId}`, {
+        method: "PUT",
         headers: {
             "Content-Type": "application/json"
         },

@@ -1,5 +1,6 @@
 ﻿using Api.DBAccess;
 using Api.Models;
+using Api.Models.User;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +21,14 @@ namespace Api.BusinessLogic
         {
             _dbAccess = dbAccess;
             _configuration = configuration;
+        }
+
+        public async Task<IActionResult> getUser(int userId)
+        {
+            User user = await _dbAccess.getUser(userId);
+
+            if (user == null || user.Id == 0) { return new ConflictObjectResult(new { message = "Could not find user" }); }
+            return new OkObjectResult(new { user.Id, user.UserName, user.Email });
         }
 
         public async Task<IActionResult> RegisterUser(User user)
@@ -47,7 +56,6 @@ namespace Api.BusinessLogic
 
             return await _dbAccess.CreateUser(user);
         }
-
         public async Task<IActionResult> Login(Login login)
         {
             User user = await _dbAccess.Login(login);
@@ -59,30 +67,43 @@ namespace Api.BusinessLogic
             if (user.Password == hashedPassword)
             {
                 var token = GenerateJwtToken(user);
-                return new OkObjectResult(new { token, user.UserName, user.Id });
+                return new OkObjectResult(new { token, user.Id});
             }
 
             return new ConflictObjectResult(new { message = "Invalid password" });
         }
 
-        public async Task<IActionResult> EditProfile(User user, int userId)
+        public async Task<IActionResult> EditProfile(EditUserRequest userRequest, int userId)
         {
-            if (!new Regex(@".+@.+\..+").IsMatch(user.Email))
+            if (!new Regex(@".+@.+\..+").IsMatch(userRequest.Email))
             {
                 return new ConflictObjectResult(new { message = "Invalid email address" });
             }
 
-            if (!PasswordSecurity(user.Password))
+
+            return await _dbAccess.UpdateUser(userRequest, userId);
+        }
+
+        public async Task<IActionResult> changePassword(ChangePasswordRequest passwordRequest, int userId)
+        {
+            var user = await _dbAccess.ReadUser(userId);
+
+            string hashedPassword = ComputeHash(passwordRequest.OldPassword, SHA256.Create(), user.Salt);
+
+            if (user.Password != hashedPassword)
             {
-                return new ConflictObjectResult(new { message = "Password is not up to the security standard" });
+                return new ConflictObjectResult(new { message = "Old password is incorrect" });
+
             }
 
-            var profile = await _dbAccess.ReadUser(userId);
+            if (!PasswordSecurity(passwordRequest.NewPassword))
+            {
+                return new ConflictObjectResult(new { message = "New password is not up to the security standard" });
+            }
 
-            string hashedPassword = ComputeHash(user.Password, SHA256.Create(), profile.Salt);
-            user.Password = hashedPassword;
+            string hashedNewPassword = ComputeHash(passwordRequest.NewPassword, SHA256.Create(), user.Salt);
 
-            return await _dbAccess.UpdateUser(user, userId);
+            return await _dbAccess.updatePassword(hashedNewPassword, userId);
         }
 
         public async Task<IActionResult> DeleteUser(int userId)

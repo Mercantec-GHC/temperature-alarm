@@ -1,12 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Api.Models;
-using Api.DBAccess;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Api.BusinessLogic;
+using Api.Models.User;
 
 namespace Api.Controllers
 {
@@ -21,31 +17,43 @@ namespace Api.Controllers
             _userLogic = userLogic;
         }
 
-        [HttpPost("Login")]
+        //[Authorize]
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUSer(int userId)
+        {
+            return await _userLogic.getUser(userId);
+        }
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
             return await _userLogic.Login(login);
         }
 
-        [HttpPost("Create")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
             return await _userLogic.RegisterUser(user);
         }
 
-        [Authorize]
-        [HttpPut("Edit/{userId}")]
-        public async Task<IActionResult> EditUser([FromBody] User user, int userId)
+        //[Authorize]
+        [HttpPut("edit/{userId}")]
+        public async Task<IActionResult> EditUser([FromBody] EditUserRequest userRequest, int userId)
         {
-            return await _userLogic.EditProfile(user, userId);
+            return await _userLogic.EditProfile(userRequest, userId);
+        }
+
+        //[Authorize]
+        [HttpPut("change-password/{userId}")]
+        public async Task<IActionResult> changePassword([FromBody] ChangePasswordRequest passwordRequest, int userId)
+        {
+            return await _userLogic.changePassword(passwordRequest, userId);
         }
 
         [Authorize]
-        [HttpDelete("Delete/{userId}")]
+        [HttpDelete("delete/{userId}")]
         public async Task<IActionResult> DeleteUser(int userId)
         {
             return await _userLogic.DeleteUser(userId);
         }
-
     }
 }

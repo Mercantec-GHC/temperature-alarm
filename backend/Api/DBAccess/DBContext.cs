@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Api.Models;
+using Api.Models.User;
 
 namespace Api
 {
