@@ -21,18 +21,21 @@ namespace Api.Controllers
             _userLogic = userLogic;
         }
 
+        // Sends the login to userLogic
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
             return await _userLogic.Login(login);
         }
 
+        // Sends the user to userLogic
         [HttpPost("Create")]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
             return await _userLogic.RegisterUser(user);
         }
 
+        // Sends the user and userId to userLogic
         [Authorize]
         [HttpPut("Edit/{userId}")]
         public async Task<IActionResult> EditUser([FromBody] User user, int userId)
@@ -40,6 +43,7 @@ namespace Api.Controllers
             return await _userLogic.EditProfile(user, userId);
         }
 
+        // Sends the userId to userLogic
         [Authorize]
         [HttpDelete("Delete/{userId}")]
         public async Task<IActionResult> DeleteUser(int userId)

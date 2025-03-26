@@ -16,6 +16,12 @@ namespace Api.BusinessLogic
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Gets the user from dbaccess using the userId and checks if the user exists
+        /// Gets all devices that match the userId and checks if there are any devices connected to the user
+        /// </summary>
+        /// <param name="userId">UserId that matches a user that owns the devices</param>
+        /// <returns>returns the devices in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> GetDevices(int userId)
         {
             var profile = await _dbAccess.ReadUser(userId);
@@ -29,6 +35,13 @@ namespace Api.BusinessLogic
             return new OkObjectResult(devices);
         }
 
+        /// <summary>
+        /// Checks if the user that the device is trying to be added to exists
+        /// Then it is send to dbaccess
+        /// </summary>
+        /// <param name="device">The new device</param>
+        /// <param name="userId">The user that owns the device</param>
+        /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> AddDevice(Device device, int userId)
         {
             var profile = await _dbAccess.ReadUser(userId);
@@ -38,6 +51,12 @@ namespace Api.BusinessLogic
             return await _dbAccess.CreateDevice(device, userId);
         }
 
+        /// <summary>
+        /// Checks if the device exist that is trying to be read from
+        /// Gets the logs and checks if there are any in the list
+        /// </summary>
+        /// <param name="deviceId">The deviceId that you want from the logs</param>
+        /// <returns>returns the logs in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> GetLogs(int deviceId)
         {
             var device = await _dbAccess.ReadDevice(deviceId);
@@ -51,6 +70,12 @@ namespace Api.BusinessLogic
             return new OkObjectResult(logs);
         }
 
+        /// <summary>
+        /// Checks if the deviceId matches a device
+        /// </summary>
+        /// <param name="device">The updated info</param>
+        /// <param name="deviceId">The device to be edited</param>
+        /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> EditDevice(Device device, int deviceId)
         {
             var device1 = _dbAccess.ReadDevice(deviceId);

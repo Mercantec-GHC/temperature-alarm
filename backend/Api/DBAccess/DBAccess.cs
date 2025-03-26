@@ -22,7 +22,7 @@ namespace Api.DBAccess
         /// Creates a user using entityframework core
         /// </summary>
         /// <param name="user">Need the entire user obj</param>
-        /// <returns>returns the true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
+        /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> CreateUser(User user)
         {
             var users = await _context.Users.ToListAsync();
@@ -118,7 +118,7 @@ namespace Api.DBAccess
         /// Deletes a user from the database
         /// </summary>
         /// <param name="userId">The Id of the user that is to be deleted</param>
-        /// <returns>returns the true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
+        /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> DeleteUser(int userId)
         {
             var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);

@@ -19,15 +19,15 @@ namespace Api.Controllers
             _deviceLogic = deviceLogic;
         }
 
+        // Sends the userId to deviceLogic
         [Authorize]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetDevices(int userId)
         {
-            List<Device> devices = await _dbAccess.ReadDevices(userId);
-            if (devices.Count == 0) { return BadRequest(new { error = "There is no devices that belong to this userID" }); }
             return await _deviceLogic.GetDevices(userId);
         }
 
+        // Sends the device and userId to deviceLogic
         [Authorize]
         [HttpPost("adddevice/{userId}")]
         public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
@@ -35,6 +35,7 @@ namespace Api.Controllers
             return await _deviceLogic.AddDevice(device, userId);
         }
 
+        // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpGet("logs/{deviceId}")]
         public async Task<IActionResult> GetLogs(int deviceId)
@@ -42,6 +43,7 @@ namespace Api.Controllers
             return await _deviceLogic.GetLogs(deviceId);
         }
 
+        // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpPut("Edit/{deviceId}")]
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
