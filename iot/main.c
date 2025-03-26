@@ -7,7 +7,8 @@
 #include <time.h>
 
 #include "brokers/amqp.h"
-#include "temperature.h"
+#include "devices/temperature.h"
+#include "devices/display.h"
 #include "device_id.h"
 
 void *watch_temperature(void *arg)
@@ -16,14 +17,21 @@ void *watch_temperature(void *arg)
 
 	printf("Device ID: %s\n", device_id);
 
-	temperature_handle_t temp_handle = init_temperature();
+	display_handle_t display = init_display();
+	display_write_str(display, " ");
+	display_set_cursor_pos(display, 0, 1);
+	display_write_str(display, "Device.....");
+	display_write_str(display, device_id);
 
+	temperature_handle_t temp_handle = init_temperature();
 	get_temperature(temp_handle);
 
 	while (true) {
+		// Retrieve data
 		double temperature = get_temperature(temp_handle);
 		size_t timestamp = time(NULL);
 
+		// Send JSON
 		char *format = "{"
 			"\"temperature\": %lf,"
 			"\"device_id\": \"%s\","
@@ -34,6 +42,15 @@ void *watch_temperature(void *arg)
 		sprintf(str, format, temperature, device_id, timestamp);
 
 		amqp_send_message("temperature-logs", str);
+
+		free(str);
+
+		// Print on display
+		str = malloc(17);
+		sprintf(str, "===[ %.1lf\xDF" "C ]===", temperature);
+
+		display_set_cursor_pos(display, 0, 0);
+		display_write_str(display, str);
 
 		free(str);
 
