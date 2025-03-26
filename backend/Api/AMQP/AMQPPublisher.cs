@@ -7,12 +7,12 @@ using System.Text.Json;
 
 namespace Api.AMQP
 {
-    public class AMQPPush
+    public class AMQPPublisher
     {
         private readonly IConfiguration _configuration;
         private readonly DbAccess _dbAccess;
 
-        public AMQPPush(IConfiguration configuration, DbAccess dbAccess)
+        public AMQPPublisher(IConfiguration configuration, DbAccess dbAccess)
         {
             _dbAccess = dbAccess;
             _configuration = configuration;
@@ -39,7 +39,7 @@ namespace Api.AMQP
 
             while (true)
             {
-
+                // Publishes all devices limits
                 var devices = _dbAccess.ReadDevices();
                 foreach (var device in devices)
                 {
@@ -52,16 +52,20 @@ namespace Api.AMQP
                     await channel.BasicPublishAsync(exchange: string.Empty, routingKey: queue, body: body);
                 }
 
+                // Short delay before disconnecting from rabbitMQ
                 await Task.Delay(10000);
 
+                // Disconnecting from rabbitMQ to save resources
                 await channel.CloseAsync();
                 Console.WriteLine($"{queue} disconnected");
                 await conn.CloseAsync();
                 Console.WriteLine("AMQPClient disconnected");
                 await channel.DisposeAsync();
                 await conn.DisposeAsync();
+                // 1 hour delay
                 await Task.Delay(3600000);
 
+                // Creating a new connection to rabbitMQ
                 conn = await factory.CreateConnectionAsync();
                 Console.WriteLine("AMQPClient connected");
                 channel = await conn.CreateChannelAsync();
@@ -70,7 +74,7 @@ namespace Api.AMQP
                 await channel.QueueDeclareAsync(queue: queue, durable: false, exclusive: false, autoDelete: false);
                 Console.WriteLine($"{queue} connected");
 
-                // Everytime a message is recieved from the queue it goes into this consumer.ReceivedAsync
+                // Here all messages is consumed so the queue is empty
                 var consumer = new AsyncEventingBasicConsumer(channel);
                 consumer.ReceivedAsync += (model, ea) =>
                 {
