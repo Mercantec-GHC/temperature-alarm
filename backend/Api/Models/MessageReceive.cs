@@ -1,6 +1,6 @@
 ﻿namespace Api.Models
 {
-    public class MQTTMessageReceive
+    public class MessageReceive
     {
         public double temperature { get; set; }
 

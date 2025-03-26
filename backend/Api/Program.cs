@@ -1,4 +1,5 @@
 using Api;
+using Api.AMQP;
 using Api.AMQPReciever;
 using Api.DBAccess;
 using Api.MQTTReciever;
@@ -27,8 +28,10 @@ class Program
                 // Choose to either connect AMQP or MQTT
                 if (rabbitMQ == "AMQP")
                 {
-                    AMQPReciever amqp = new AMQPReciever(configuration, dbAccess);
-                    amqp.Handle_Received_Application_Message().Wait();
+                    AMQPReciever amqpReciever = new AMQPReciever(configuration, dbAccess);
+                    amqpReciever.Handle_Received_Application_Message().Wait();
+                    AMQPPush aMQPPush = new AMQPPush(configuration, dbAccess);
+                    aMQPPush.Handle_Push_Device_Limits().Wait();
                 }
                 else if (rabbitMQ == "MQTT")
                 {

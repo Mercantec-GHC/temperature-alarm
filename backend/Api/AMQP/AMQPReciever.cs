@@ -30,7 +30,7 @@ namespace Api.AMQPReciever
 
             // Connecting to our rabbitmq and after that it create's a channel where you can connect to a queue
             using var conn = await factory.CreateConnectionAsync();
-            Console.WriteLine("AMQPClien connected");
+            Console.WriteLine("AMQPClient connected");
             using var channel = await conn.CreateChannelAsync();
 
             // Here we connect to the queue through the channel that got created earlier
@@ -45,7 +45,7 @@ namespace Api.AMQPReciever
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
-                var messageReceive = JsonSerializer.Deserialize<MQTTMessageReceive>(message);
+                var messageReceive = JsonSerializer.Deserialize<MessageReceive>(message);
 
                 // Checks if the message has the data we need
                 if (messageReceive == null || messageReceive.device_id == null || messageReceive.timestamp == 0)

@@ -189,6 +189,12 @@ namespace Api.DBAccess
             return _context.Devices.FirstOrDefault(d => d.ReferenceId == refenreId);
         }
 
+        // Returns all devices
+        public List<Device> ReadDevices()
+        {
+            return _context.Devices.ToList();
+        }
+
         /// <summary>
         /// Updates a device in the database
         /// </summary>

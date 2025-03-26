@@ -43,7 +43,7 @@ namespace Api.MQTTReciever
 
                     string sensorData = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
-                    var messageReceive = JsonSerializer.Deserialize<MQTTMessageReceive>(sensorData);
+                    var messageReceive = JsonSerializer.Deserialize<MessageReceive>(sensorData);
 
                     // Checks if the message has the data we need
                     if (messageReceive == null || messageReceive.device_id == null || messageReceive.timestamp == 0)
