@@ -11,8 +11,10 @@
 
 #include "temperature.h"
 
-#define MPC9808_BUS	"/dev/i2c-2"
-#define MPC9808_ADR	0x18
+#define MCP9808_BUS	"/dev/i2c-2"
+#define MCP9808_ADR	0x18
+#define MCP9808_MANID 0x0054
+#define MCP9808_DEVID 0x04
 
 #define CONFIG_REG 0x01
 #define TUPPER_REG 0x02
@@ -53,16 +55,16 @@ double get_temperature(temperature_handle_t file)
 
 temperature_handle_t init_temperature(void)
 {
-	int file = open(MPC9808_BUS, O_RDWR);
+	int file = open(MCP9808_BUS, O_RDWR);
 
 	if (file < 0) {
-		fprintf(stderr, "Error opening temperature sensor device (%s): %s\n", MPC9808_BUS, strerror(errno));
-		exit(1);
+		perror("Error opening temperature sensor device");
+		exit(EXIT_FAILURE);
 	}
 
-	if (ioctl(file, I2C_SLAVE, MPC9808_ADR) == -1) {
-		fprintf(stderr, "ERROR: setting  address %d on i2c bus %s with ioctl() - %s", MPC9808_ADR, MPC9808_BUS, strerror(errno));
-		exit(1);
+	if (ioctl(file, I2C_SLAVE, MCP9808_ADR) == -1) {
+		fprintf(stderr, "ERROR: setting address %d on i2c bus %s with ioctl() - %s", MCP9808_ADR, MCP9808_BUS, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
 
 	int32_t reg32;
@@ -73,23 +75,23 @@ temperature_handle_t init_temperature(void)
 	reg32 = i2c_smbus_read_word_data(file, MANID_REG);
 
 	if (reg32 < 0) {
-			fprintf(stderr, "ERROR: Read failed  on i2c bus register %d - %s\n",  MANID_REG,strerror(errno));
-			exit(1);
+		fprintf(stderr, "Read failed on i2c bus register %d: %s\n", MANID_REG, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
-	if (bswap_16(reg16poi[0]) != 0x0054) {
-		fprintf(stderr, "Manufactorer ID wrong is 0x%x should be 0x54\n",__bswap_16(reg16poi[0]));
-		exit(1);
+	if (bswap_16(reg16poi[0]) != MCP9808_MANID) {
+		fprintf(stderr, "Invalid manufacturer ID: Expected 0x%x, got 0x%x\n", MCP9808_MANID, __bswap_16(reg16poi[0]));
+		exit(EXIT_FAILURE);
 	}
 
 	// Read device ID and revision
 	reg32 = i2c_smbus_read_word_data(file, DEVID_REG);
 	if (reg32 < 0) {
-		fprintf(stderr, "ERROR: Read failed  on i2c bus register %d - %s\n",  DEVID_REG,strerror(errno) );
-		exit(1);
+		fprintf(stderr, "Read failed on i2c bus register %d - %s\n", DEVID_REG, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
-	if (reg8poi[0] != 0x04) {
-		fprintf(stderr, "Manufactorer ID OK but device ID wrong is 0x%x should be 0x4\n",reg8poi[0]);
-		exit(1);
+	if (reg8poi[0] != MCP9808_DEVID) {
+		fprintf(stderr, "Invalid device ID - expected 0x%x, got 0x%x\n", MCP9808_DEVID, reg8poi[0]);
+		exit(EXIT_FAILURE);
 	}
 
 	return file;
