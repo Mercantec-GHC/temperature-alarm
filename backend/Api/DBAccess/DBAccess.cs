@@ -75,6 +75,20 @@ namespace Api.DBAccess
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
+        // Returns a user according to refreshToken
+        public async Task<User> ReadUser(string refreshToken)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        public async void UpdatesRefreshToken(string refreshToken, int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiresAt = DateTime.Now.AddDays(7);
+        }
+
         /// <summary>
         /// Updates the user in the database
         /// </summary>

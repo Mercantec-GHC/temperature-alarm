@@ -49,7 +49,7 @@ namespace Api.BusinessLogic
 
             string salt = Guid.NewGuid().ToString();
             string hashedPassword = ComputeHash(user.Password, SHA256.Create(), salt);
-            
+
             user.Salt = salt;
             user.Password = hashedPassword;
 
@@ -74,7 +74,9 @@ namespace Api.BusinessLogic
             if (user.Password == hashedPassword)
             {
                 var token = GenerateJwtToken(user);
-                return new OkObjectResult(new { token, user.UserName, user.Id });
+                user.RefreshToken = Guid.NewGuid().ToString();
+                _dbAccess.UpdatesRefreshToken(user.RefreshToken, user.Id);
+                return new OkObjectResult(new { token, user.UserName, user.Id, refreshToken = user.RefreshToken });
             }
 
             return new ConflictObjectResult(new { message = "Invalid password" });
@@ -117,6 +119,13 @@ namespace Api.BusinessLogic
         public async Task<IActionResult> DeleteUser(int userId)
         {
             return await _dbAccess.DeleteUser(userId);
+        }
+
+        public async Task<IActionResult> RefreshToken(string refreshToken)
+        {
+            User user = await _dbAccess.ReadUser(refreshToken);
+            if (user == null) { return new ConflictObjectResult(new { message = "Could not match refreshtoken" }); }
+            return new OkObjectResult(GenerateJwtToken(user));
         }
 
         /// <summary>
