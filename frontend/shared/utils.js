@@ -1,7 +1,7 @@
 import { address } from "./constants.js";
 
 export async function request(method, path, body = null) {
-    const token = document.cookie.match(/\bauth-token=(\S+)/);
+    const token = document.cookie.match(/\bauth-token=([^;\s]+)/);
 
     return new Promise((resolve, reject) => {
         fetch(address + path, {

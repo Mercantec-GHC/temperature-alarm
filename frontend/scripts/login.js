@@ -10,10 +10,16 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
     
     login(emailOrUsername, password)
         .then(response => {
+            document.cookie = `auth-token=${response.token}`;
+
+            localStorage.setItem("user", {
+                id: response.id,
+                username: response.userName,
+            });
+
             location.href = "/home";
         })
         .catch(error => {
-            console.log(error);
             document.getElementById("form-error").innerText = error;
             document.getElementById("form-error").style.display = "block";
         });
