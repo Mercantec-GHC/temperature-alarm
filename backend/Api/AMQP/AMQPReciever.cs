@@ -4,6 +4,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 
 namespace Api.AMQPReciever
 {
@@ -11,34 +12,27 @@ namespace Api.AMQPReciever
     {
         private readonly IConfiguration _configuration;
         private readonly DbAccess _dbAccess;
+        private IConnection _conn;
+        private IChannel _channel;
+        private ConnectionFactory _factory;
+        private string _queue;
 
         public AMQPReciever(IConfiguration configuration, DbAccess dbAccess)
         {
             _dbAccess = dbAccess;
             _configuration = configuration;
+            _factory = new ConnectionFactory();
+            _queue = "temperature-logs";
+
+            InitFactory();
         }
 
         public async Task Handle_Received_Application_Message()
         {
-            var factory = new ConnectionFactory();
-            var queue = "temperature-logs";
-
-            factory.UserName = _configuration["AMQP:username"];
-            factory.Password = _configuration["AMQP:password"];
-            factory.HostName = _configuration["AMQP:host"];
-            factory.Port = Convert.ToInt32(_configuration["AMQP:port"]);
-
-            // Connecting to our rabbitmq and after that it create's a channel where you can connect to a queue
-            using var conn = await factory.CreateConnectionAsync();
-            Console.WriteLine("AMQPClient connected");
-            using var channel = await conn.CreateChannelAsync();
-
-            // Here we connect to the queue through the channel that got created earlier
-            await channel.QueueDeclareAsync(queue: queue, durable: false, exclusive: false, autoDelete: false);
-            Console.WriteLine($"{queue} connected");
+            await Connect();
 
             // Everytime a message is recieved from the queue it goes into this consumer.ReceivedAsync
-            var consumer = new AsyncEventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += (model, ea) =>
             {
                 Console.WriteLine("Received application message.");
@@ -73,9 +67,44 @@ namespace Api.AMQPReciever
             };
 
             // Consumes the data in the queue
-            await channel.BasicConsumeAsync(queue, true, consumer);
+            await _channel.BasicConsumeAsync(_queue, true, consumer);
 
 			while (true);
+
+            await Dispose();
+        }
+
+        // Disconnects from rabbitMQ
+        private async Task<bool> Dispose()
+        {
+            await _channel.CloseAsync();
+            await _conn.CloseAsync();
+            await _channel.DisposeAsync();
+            await _conn.DisposeAsync();
+            return true;
+        }
+
+        // Connects to rabbitMQ
+        private async Task<bool> Connect()
+        {
+            // Creating a new connection to rabbitMQ
+            _conn = await _factory.CreateConnectionAsync();
+            Console.WriteLine("AMQPClient connected");
+            _channel = await _conn.CreateChannelAsync();
+
+            // Here we connect to the queue through the channel that got created earlier
+            await _channel.QueueDeclareAsync(queue: _queue, durable: false, exclusive: false, autoDelete: false);
+            Console.WriteLine($"{_queue} connected");
+            return true;
+        }
+
+        // The info for the factory
+        private void InitFactory()
+        {
+            _factory.UserName = _configuration["AMQP:username"];
+            _factory.Password = _configuration["AMQP:password"];
+            _factory.HostName = _configuration["AMQP:host"];
+            _factory.Port = Convert.ToInt32(_configuration["AMQP:port"]);
         }
     }
 }

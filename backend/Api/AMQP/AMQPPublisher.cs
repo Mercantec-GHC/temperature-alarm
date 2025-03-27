@@ -1,7 +1,9 @@
 ﻿using Api.DBAccess;
 using Api.Models;
+using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -11,34 +13,27 @@ namespace Api.AMQP
     {
         private readonly IConfiguration _configuration;
         private readonly DbAccess _dbAccess;
+        private IConnection _conn;
+        private IChannel _channel;
+        private ConnectionFactory _factory;
+        private string _queue;
 
         public AMQPPublisher(IConfiguration configuration, DbAccess dbAccess)
         {
             _dbAccess = dbAccess;
             _configuration = configuration;
+            _factory = new ConnectionFactory();
+            _queue = "temperature-limits";
+
+            InitFactory();
         }
 
         public async Task Handle_Push_Device_Limits()
         {
-            var factory = new ConnectionFactory();
-            var queue = "temperature-limits";
-
-            factory.UserName = _configuration["AMQP:username"];
-            factory.Password = _configuration["AMQP:password"];
-            factory.HostName = _configuration["AMQP:host"];
-            factory.Port = Convert.ToInt32(_configuration["AMQP:port"]);
-
-            // Connecting to our rabbitmq and after that it create's a channel where you can connect to a queue
-            var conn = await factory.CreateConnectionAsync();
-            Console.WriteLine("AMQPClient connected");
-            var channel = await conn.CreateChannelAsync();
-
-            // Here we connect to the queue through the channel that got created earlier
-            await channel.QueueDeclareAsync(queue: queue, durable: false, exclusive: false, autoDelete: false);
-            Console.WriteLine($"{queue} connected");
-
             while (true)
             {
+                await Connect();
+
                 // Publishes all devices limits
                 var devices = _dbAccess.ReadDevices();
                 foreach (var device in devices)
@@ -49,33 +44,21 @@ namespace Api.AMQP
                     deviceLimit.TempLow = device.TempLow;
                     string message = JsonSerializer.Serialize(deviceLimit);
                     var body = Encoding.UTF8.GetBytes(message);
-                    await channel.BasicPublishAsync(exchange: string.Empty, routingKey: queue, body: body);
+                    await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: _queue, body: body);
                 }
 
                 // Short delay before disconnecting from rabbitMQ
-                await Task.Delay(10000);
+                await Task.Delay(1000);
 
                 // Disconnecting from rabbitMQ to save resources
-                await channel.CloseAsync();
-                Console.WriteLine($"{queue} disconnected");
-                await conn.CloseAsync();
-                Console.WriteLine("AMQPClient disconnected");
-                await channel.DisposeAsync();
-                await conn.DisposeAsync();
+                await Dispose();
                 // 1 hour delay
                 await Task.Delay(3600000);
 
-                // Creating a new connection to rabbitMQ
-                conn = await factory.CreateConnectionAsync();
-                Console.WriteLine("AMQPClient connected");
-                channel = await conn.CreateChannelAsync();
-
-                // Here we connect to the queue through the channel that got created earlier
-                await channel.QueueDeclareAsync(queue: queue, durable: false, exclusive: false, autoDelete: false);
-                Console.WriteLine($"{queue} connected");
+                await Connect();
 
                 // Here all messages is consumed so the queue is empty
-                var consumer = new AsyncEventingBasicConsumer(channel);
+                var consumer = new AsyncEventingBasicConsumer(_channel);
                 consumer.ReceivedAsync += (model, ea) =>
                 {
                     Console.WriteLine("Emptying queue");
@@ -84,9 +67,45 @@ namespace Api.AMQP
                 };
 
                 // Consumes the data in the queue
-                await channel.BasicConsumeAsync(queue, true, consumer);
+                await _channel.BasicConsumeAsync(_queue, true, consumer);
 
+                // Short delay before disconnecting from rabbitMQ
+                await Task.Delay(1000);
+                await Dispose();
             }
+        }
+
+        // Disconnects from rabbitMQ
+        private async Task<bool> Dispose()
+        {
+            await _channel.CloseAsync();
+            await _conn.CloseAsync();
+            await _channel.DisposeAsync();
+            await _conn.DisposeAsync();
+            return true;
+        }
+
+        // Connects to rabbitMQ
+        private async Task<bool> Connect()
+        {
+            // Creating a new connection to rabbitMQ
+            _conn = await _factory.CreateConnectionAsync();
+            Console.WriteLine("AMQPClient connected");
+            _channel = await _conn.CreateChannelAsync();
+
+            // Here we connect to the queue through the channel that got created earlier
+            await _channel.QueueDeclareAsync(queue: _queue, durable: false, exclusive: false, autoDelete: false);
+            Console.WriteLine($"{_queue} connected");
+            return true;
+        }
+
+        // The info for the factory
+        private void InitFactory()
+        {
+            _factory.UserName = _configuration["AMQP:username"];
+            _factory.Password = _configuration["AMQP:password"];
+            _factory.HostName = _configuration["AMQP:host"];
+            _factory.Port = Convert.ToInt32(_configuration["AMQP:port"]);
         }
     }
 }
