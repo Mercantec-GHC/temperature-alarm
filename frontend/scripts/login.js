@@ -10,13 +10,12 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
     
     login(emailOrUsername, password)
         .then(response => {
-            if (response.error) {
-                document.getElementById("form-error").innerText = response.error;
-                document.getElementById("form-error").style.display = "block";
-
-                return;
-            }
-
             location.href = "/home";
+        })
+        .catch(error => {
+            console.log(error);
+            document.getElementById("form-error").innerText = error;
+            document.getElementById("form-error").style.display = "block";
         });
 });
+

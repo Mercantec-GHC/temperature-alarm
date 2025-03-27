@@ -14,13 +14,10 @@ document.getElementById("registerForm").addEventListener("submit", function(even
     // Call function with form values
     create(email, username, password, repeatPassword)
         .then(response => {
-            if (response?.error) {
-                document.getElementById("form-error").innerText = response.error;
-                document.getElementById("form-error").style.display = "block";
-
-                return;
-            }
-
             location.href = "/login";
+        })
+        .catch(error => {
+            document.getElementById("form-error").innerText = error;
+            document.getElementById("form-error").style.display = "block";
         });
 });
