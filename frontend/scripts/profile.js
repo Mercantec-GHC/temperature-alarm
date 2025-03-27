@@ -22,11 +22,11 @@ table.innerHTML += `
 
 var pswModal = document.getElementById("PasswordModal");
 var editModal = document.getElementById("editModal");
-var editBtn = document.getElementById("openEditModal");
+var editIconbtn = document.getElementById("openEditModal");
 var passwordBtn = document.getElementById("openPasswordModal");
 
 // Open modals
-editBtn.onclick = () => (editModal.style.display = "block");
+editIconbtn.onclick = () => (editModal.style.display = "block");
 passwordBtn.onclick = () => (pswModal.style.display = "block");
 
 // Close modals when clicking on any close button

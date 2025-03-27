@@ -30,9 +30,9 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpPost("adddevice/{userId}")]
-        public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
+        public async Task<IActionResult> AddDevice([FromBody] string referenceId, int userId)
         {
-            return await _deviceLogic.AddDevice(device, userId);
+            return await _deviceLogic.AddDevice(referenceId, userId);
         }
 
         [Authorize]
@@ -47,6 +47,14 @@ namespace Api.Controllers
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
         {
             return await _deviceLogic.EditDevice(device, deviceId);
+        }
+
+
+        [Authorize]
+        [HttpDelete("Delete/{referenceId}")]
+        public async Task<IActionResult> EditDevice(string referenceId)
+        {
+            return await _deviceLogic.EditDevice(referenceId);
         }
     }
 }

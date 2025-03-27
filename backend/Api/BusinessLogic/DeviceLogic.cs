@@ -29,11 +29,20 @@ namespace Api.BusinessLogic
             return new OkObjectResult(devices);
         }
 
-        public async Task<IActionResult> AddDevice(Device device, int userId)
+        public async Task<IActionResult> AddDevice(string referenceId, int userId)
         {
             var profile = await _dbAccess.ReadUser(userId);
 
             if (profile == null) { return new ConflictObjectResult(new { message = "Could not find user" }); }
+
+            Device device = new Device
+            {
+                Name = "Undefined",
+                TempHigh = 0,
+                TempLow = 0,
+                ReferenceId = referenceId,
+                Logs = new List<TemperatureLogs>(),
+            };
 
             return await _dbAccess.CreateDevice(device, userId);
         }
