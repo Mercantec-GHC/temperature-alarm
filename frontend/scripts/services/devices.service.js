@@ -1,4 +1,5 @@
 import { address } from "../../shared/constants.js";
+import { request } from "../../shared/utils.js";
 
 export function getDevicesOnUserId(id) {
     fetch(`${address}/get-on-user-id`, {
@@ -27,13 +28,5 @@ export function update(ids) {
 }
 
 export function getLogsOnDeviceId(id) {
-    fetch(`${address}/device/logs/${id}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        },
-    })
-    .then(response => response.json())
-    .then(data => console.log("Success:", data))
-    .catch(error => console.error("Error:", error));
+    return request("GET", `/device/logs/${id}`);
 }

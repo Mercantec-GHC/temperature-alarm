@@ -1,20 +1,20 @@
-import { mockTemperatureLogs } from "../mockdata/temperature-logs.mockdata.js"; // Import data
 import { getLogsOnDeviceId } from "./services/devices.service.js";
 
-async function buildChart() {
-    const data = await getLogsOnDeviceId(1);
+async function buildChart(data) {
+    data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    const xValues = mockTemperatureLogs.map((log) =>
+    const xValues = data.map((log) =>
         new Date(log.date).toLocaleString()
     ); // Full Date labels
-    const yValues = mockTemperatureLogs.map((log) => log.temperature); // Temperature values
-    buildTable(mockTemperatureLogs);
+    const yValues = data.map((log) => log.temperature); // Temperature values
+    buildTable(data);
     new Chart("myChart", {
         type: "line",
         data: {
             labels: xValues,
             datasets: [
                 {
+                    label: "Temperature",
                     fill: false,
                     lineTension: 0.4,
                     backgroundColor: "rgba(0,0,255,1.0)",
@@ -43,29 +43,41 @@ function buildTable(data) {
     data.forEach((log) => {
         var averageTemp = (log.tempHigh + log.tempLow) / 2.0;
         var color;
-        if (log.temperature > log.tempHigh) {
+        if (log.temperature >= log.tempHigh) {
             color = "tempHigh";
         } else if (
             log.temperature < log.tempHigh &&
             log.temperature > averageTemp
         ) {
             color = "tempMidHigh";
-        } else if (log.temperature < log.tempLow) {
+        } else if (log.temperature <= log.tempLow) {
             color = "tempLow";
         } else if (log.temperature > log.tempLow && log.temperature < averageTemp) {
             color = "tempMidLow";
         } else {
             color = "tempNormal";
         }
-        var row = `  <tr>
-                        <td>Name</td>
-                        <td class="${color}">${log.temperature}</td>
-                        <td>${log.date}</td>
-                        <td class="tempHigh">${log.tempHigh}</td>
-                        <td class="tempLow">${log.tempLow}</td>
-                    </tr>`;
-        table.innerHTML += row;
+
+        const date = new Date(log.date).toLocaleDateString();
+        const time = new Date(log.date).toLocaleTimeString();
+
+        table.innerHTML += `
+            <tr>
+                <td class="temperature ${color}">${log.temperature}&deg;C</td>
+                <td>${date}</td>
+                <td width="50%">${time}</td>
+                <td width="50%">Min: <b class="low-limit">${log.tempLow}&deg;C</b>, Max: <b class="high-limit">${log.tempHigh}&deg;C</b></td>
+            </tr>
+        `;
     });
 }
 
-buildChart();
+// TODO change device id
+getLogsOnDeviceId(1)
+    .then(buildChart)
+    .catch(err => {
+        document.getElementById("error").innerText = err;
+        document.getElementById("error").style.display = "block";
+        document.getElementById("container").style.display = "none";
+    });
+
