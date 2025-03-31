@@ -3,6 +3,7 @@ using Api.Models;
 using Api.DBAccess;
 using Microsoft.AspNetCore.Authorization;
 using Api.BusinessLogic;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -19,29 +20,48 @@ namespace Api.Controllers
             _deviceLogic = deviceLogic;
         }
 
+        // Sends the userId to deviceLogic
         [Authorize]
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetDevices(int userId)
+        [HttpGet]
+        public async Task<IActionResult> GetDevices()
         {
-            List<Device> devices = await _dbAccess.ReadDevices(userId);
-            if (devices.Count == 0) { return BadRequest(new { error = "There is no devices that belong to this userID" }); }
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
             return await _deviceLogic.GetDevices(userId);
         }
 
+        // Sends the device and userId to deviceLogic
         [Authorize]
-        [HttpPost("adddevice/{userId}")]
-        public async Task<IActionResult> AddDevice([FromBody] string referenceId, int userId)
+        [HttpPost("adddevice")]
+        public async Task<IActionResult> AddDevice([FromBody] Device device)
         {
-            return await _deviceLogic.AddDevice(referenceId, userId);
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
+            return await _deviceLogic.AddDevice(device, userId);
         }
 
+        // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpGet("logs/{deviceId}")]
-        public async Task<IActionResult> GetLogs(int deviceId)
+        public async Task<IActionResult> GetLogs(int deviceId, DateTime? dateTimeStart = null, DateTime? dateTimeEnd = null)
         {
-            return await _deviceLogic.GetLogs(deviceId);
+            DateTimeRange dateTimeRange = new DateTimeRange();
+            if (dateTimeStart != null && dateTimeEnd != null)
+            {
+                dateTimeRange.DateTimeStart = (DateTime)dateTimeStart;
+                dateTimeRange.DateTimeEnd= (DateTime)dateTimeEnd;
+            }
+            else
+            {
+                dateTimeRange.DateTimeStart = DateTime.Now;
+                dateTimeRange.DateTimeEnd = dateTimeRange.DateTimeStart;
+            }
+            return await _deviceLogic.GetLogs(dateTimeRange, deviceId);
         }
 
+        // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpPut("Edit/{deviceId}")]
         public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)

@@ -1,13 +1,51 @@
 body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #F9F9F9;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 #container {
-  background-color: white;
-  opacity: 100%;
+    margin: 0 2rem;
+}
+
+.topnav {
+    overflow: hidden;
+    background-color: #333;
+}
+
+.topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.topnav a.active {
+    background-color: #04aa6d;
+    color: white;
+}
+
+#table-wrapper {
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid #DDD;
 }
 
 table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    background-color: white;
+    color: #616161;
   margin: 20px;
   font-family: arial, sans-serif;
   border-collapse: collapse;
@@ -16,38 +54,63 @@ table {
 
 td,
 th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
+    border-right: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    border-bottom: 2px solid #DDD;
 }
 
 tr:nth-child(even) {
-  background-color: #dddddd;
+    background-color: #F5F5F5;
+}
+
+table .temperature {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    width: 20px;
+}
+table tr:not(:last-child) .temperature {
+    border-bottom-color: white;
 }
 
 .tempHigh {
-  color: #ff0000;
-  width: 20px;
+    background-color: #ff0000;
 }
-
 .tempMidHigh {
-  color: #fffb00;
-  width: 20px;
+    background-color: #FFA000;
 }
-
 .tempNormal {
-  color: #02ed26;
-  width: 20px;
+    background-color: #AAA;
 }
-
 .tempMidLow {
-  color: #16fae7;
-  width: 20px;
+    background-color: #64B5F6;
+}
+.tempLow {
+    background-color: #3F51B5;
 }
 
-.tempLow {
-  color: #0004ff;
-  width: 20px;
+.low-limit {
+    color: #3F51B5;
+}
+.high-limit {
+    color: #F00;
+}
+
+.chart-container {
+    margin: 2rem 0;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #DDD;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+#error {
+    margin: 2rem;
 }
 
 .chartContainer{

@@ -1,13 +1,37 @@
-export async function handleResponse(response) {
-    const json = await response.json();
+import { address } from "./constants.js";
 
-    if (response.ok || json.error) return json;
+export async function request(method, path, body = null) {
+    const token = document.cookie.match(/\bauth-token=([^;\s]+)/);
 
-    if (json.errors) {
-        return { error: Object.values(response.errors)[0][0] };
-    }
+    const headers = {};
+    if (body)
+        headers["Content-Type"] = "application/json";
+    if (token?.length > 1)
+        headers["Authorization"] = `Bearer ${token[1]}`;
 
-    return { error: "Request failed with HTTP code " + response.status };
+    return new Promise((resolve, reject) => {
+        fetch(address + path, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : undefined,
+        })
+        .then(async response => {
+            try {
+                const json = await response.json();
+
+                if (response.ok) return resolve(json);
+
+                if (json.error) return reject(json.error);
+
+                if (json.message) return reject(json.message);
+
+                if (json.errors) return reject(Object.values(json.errors)[0][0]);
+            } finally {
+                reject("Request failed with HTTP code " + response.status);
+            }
+        })
+        .catch(err => reject(err.message));
+    });
 }
 
 document.querySelectorAll(".logoutContainer").forEach(closeBtn => {

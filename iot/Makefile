@@ -1,3 +1,5 @@
-all: main.c mqtt.c temperature.c device_id.c
-	$(CC) -lmosquitto -lpthread -li2c main.c mqtt.c temperature.c device_id.c
+FILES=main.c brokers/mqtt.c brokers/amqp.c devices/temperature.c devices/display.c device_id.c
+
+all: $(FILES)
+	$(CC) -lmosquitto -lrabbitmq -lpthread -li2c $(FILES)
 

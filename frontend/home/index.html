@@ -1,43 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Temperature-Alarm-Web</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    <link rel="stylesheet" href="/styles/auth.css">
-    <link rel="stylesheet" href="/styles/home.css" />
-    <script type="module" src="/scripts/home.js"></script>
-    <script defer type="module" src="/shared/utils.js"></script>
-  </head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Temperature-Alarm-Web</title>
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script defer type="module" src="/scripts/home.js"></script>
+        <link rel="stylesheet" href="/styles/common.css">
+        <link rel="stylesheet" href="/styles/home.css" />
+    </head>
 
-  <body>
-    <div id="container">
-      <div class="topnav">
-        <a class="active" href="/home/index.html">Home</a>
-        <a href="/devices/index.html">Devices</a>
-        <div style="display: flex; justify-content: flex-end;">
-          <a href="/profile/index.html">Profile</a>
-          <span class="logoutContainer">
-            <img class="logout" src="/img/logout.png">
-          </span>
+    <body>
+        <div class="topnav">
+            <a class="active" href="/home/index.html">Home</a>
+            <div style="display: flex; justify-content: flex-end;">
+                <a class="" href="/home/index.html">Devices</a>
+                <a class="" href="/profile/index.html">Profile</a>
+            </div>
         </div>
-      </div>
-      <div class="chartContainer">
-        <canvas id="myChart" style="width: 49%; height: 49%;"></canvas>
-      </div>
-      <div class="tableConatiner">
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Temperature</th>
-            <th>Date</th>
-            <th>TempHigh</th>
-            <th>TempLow</th>
-          </tr>
-          <tbody id="TemperatureTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </body>
+        <div id="container">
+            <div class="chart-container">
+                <canvas id="myChart" style="width: 49%; height: 49%;"></canvas>
+            </div>
+            <div id="table-wrapper">
+                <table>
+                    <tr>
+                        <th>Temperature</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Limits</th>
+                    </tr>
+                    <tbody id="TemperatureTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="error" class="error"></div>
+    </body>
 </html>
+

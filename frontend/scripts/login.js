@@ -10,17 +10,18 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
     
     login(emailOrUsername, password)
         .then(response => {
-            if (response.error) {
-                document.getElementById("form-error").innerText = response.error;
-                document.getElementById("form-error").style.display = "block";
-                return;
-            }
-            else{
-                if (typeof(Storage) !== "undefined") {
-                    localStorage.setItem("id", response.id);
-                }
-            }
+            document.cookie = `auth-token=${response.token}; Path=/`;
+
+            localStorage.setItem("user", {
+                id: response.id,
+                username: response.userName,
+            });
 
             location.href = "/home";
+        })
+        .catch(error => {
+            document.getElementById("form-error").innerText = error;
+            document.getElementById("form-error").style.display = "block";
         });
 });
+

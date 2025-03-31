@@ -1,3 +1,10 @@
 .error {
-	background-color: #EF9A9A;
+    display: none;
+    background-color: #FFCDD2;
+    color: #C62828;
+    border: 1px solid #C62828;
+    border-radius: 4px;
+    padding: 1rem 2rem;
+    margin-top: 1rem;
 }
+

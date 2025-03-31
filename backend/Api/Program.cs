@@ -1,10 +1,10 @@
 using Api;
+using Api.AMQP;
 using Api.AMQPReciever;
 using Api.DBAccess;
 using Api.MQTTReciever;
 using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 class Program
 {
@@ -12,7 +12,7 @@ class Program
     public static void Main(string[] args)
     {
         var app = CreateWebHostBuilder(args).Build();
-
+        string rabbitMQ = "AMQP"; // This value has to be either "AMQP" or "MQTT"
 
         RunMigrations(app);
 
@@ -24,11 +24,19 @@ class Program
                 var configuration = services.GetRequiredService<IConfiguration>();
                 var dbAccess = services.GetRequiredService<DbAccess>();
 
-                //AMQPReciever amqp = new AMQPReciever(configuration, dbAccess);
-                //amqp.Handle_Received_Application_Message().Wait();
-
-                MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
-                mqtt.Handle_Received_Application_Message().Wait();
+                // Choose to either connect AMQP or MQTT
+                if (rabbitMQ == "AMQP")
+                {
+                    AMQPReciever amqpReciever = new AMQPReciever(configuration, dbAccess);
+                    amqpReciever.Handle_Received_Application_Message().Wait();
+                    AMQPPublisher aMQPPush = new AMQPPublisher(configuration, dbAccess);
+                    aMQPPush.Handle_Push_Device_Limits().Wait();
+                }
+                else if (rabbitMQ == "MQTT")
+                {
+                    MQTTReciever mqtt = new MQTTReciever(configuration, dbAccess);
+                    mqtt.Handle_Received_Application_Message().Wait();
+                }                
             }
         });
 
