@@ -3,6 +3,7 @@ using Api.Models;
 using Api.DBAccess;
 using Microsoft.AspNetCore.Authorization;
 using Api.BusinessLogic;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -21,17 +22,23 @@ namespace Api.Controllers
 
         // Sends the userId to deviceLogic
         [Authorize]
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetDevices(int userId)
+        [HttpGet]
+        public async Task<IActionResult> GetDevices()
         {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
             return await _deviceLogic.GetDevices(userId);
         }
 
         // Sends the device and userId to deviceLogic
         [Authorize]
-        [HttpPost("adddevice/{userId}")]
-        public async Task<IActionResult> AddDevice([FromBody] Device device, int userId)
+        [HttpPost("adddevice")]
+        public async Task<IActionResult> AddDevice([FromBody] Device device)
         {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
             return await _deviceLogic.AddDevice(device, userId);
         }
 

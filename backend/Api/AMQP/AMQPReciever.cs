@@ -70,18 +70,6 @@ namespace Api.AMQPReciever
             await _channel.BasicConsumeAsync(_queue, true, consumer);
 
 			while (true);
-
-            await Dispose();
-        }
-
-        // Disconnects from rabbitMQ
-        private async Task<bool> Dispose()
-        {
-            await _channel.CloseAsync();
-            await _conn.CloseAsync();
-            await _channel.DisposeAsync();
-            await _conn.DisposeAsync();
-            return true;
         }
 
         // Connects to rabbitMQ

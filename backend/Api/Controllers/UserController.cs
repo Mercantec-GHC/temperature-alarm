@@ -37,17 +37,23 @@ namespace Api.Controllers
 
         // Sends the user and userId to userLogic
         [Authorize]
-        [HttpPut("Edit/{userId}")]
-        public async Task<IActionResult> EditUser([FromBody] User user, int userId)
+        [HttpPut("Edit")]
+        public async Task<IActionResult> EditUser([FromBody] User user)
         {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
             return await _userLogic.EditProfile(user, userId);
         }
 
         // Sends the userId to userLogic
         [Authorize]
-        [HttpDelete("Delete/{userId}")]
-        public async Task<IActionResult> DeleteUser(int userId)
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> DeleteUser()
         {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
             return await _userLogic.DeleteUser(userId);
         }
 
