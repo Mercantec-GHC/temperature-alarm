@@ -1,8 +1,6 @@
 import { getLogsOnDeviceId } from "./services/devices.service.js";
 
-async function buildChart() {
-    // TODO change device id
-    const data = await getLogsOnDeviceId(1);
+async function buildChart(data) {
     data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     const xValues = data.map((log) =>
@@ -74,4 +72,12 @@ function buildTable(data) {
     });
 }
 
-buildChart();
+// TODO change device id
+getLogsOnDeviceId(1)
+    .then(buildChart)
+    .catch(err => {
+        document.getElementById("error").innerText = err;
+        document.getElementById("error").style.display = "block";
+        document.getElementById("container").style.display = "none";
+    });
+
