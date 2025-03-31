@@ -13,20 +13,23 @@
         <div id="container">
             <div class="topnav">
                 <a href="/home/index.html">Home</a>
-                <a href="/devices/index.html">Devices</a>
                 <div style="display: flex; justify-content: flex-end;">
+                    <a href="/devices/index.html">Devices</a>
                   <a class="active" href="/profile/index.html">Profile</a>
                   <span class="logoutContainer">
                     <img class="logout" src="/img/logout.png">
                   </span>
                 </div>
               </div>
-            <div id="profileCard"></div>
-            <div class="btnContainer">
-                <button class="btn" id="openEditModal">Edit</button>
-                <button class="btn" id="openPasswordModal">Change Password</button>
-
-            </div>
+              <div style="display: flex; justify-content: center;"> 
+                <div class="profileContainer">
+                    <div id="profileCard"></div>
+                    <div class="btnContainer">
+                        <button class="btn" id="openEditModal">Edit</button>
+                        <button class="btn" id="openPasswordModal">Change Password</button>
+                    </div>
+                  </div>
+              </div>
         </div>
 
         <div id="editModal" class="modal">

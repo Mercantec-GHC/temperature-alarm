@@ -85,3 +85,12 @@ h2{
     width: 90%;
   }
 
+  .profileContainer {
+    margin: 2rem 0;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #DDD;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+

@@ -21,13 +21,6 @@ namespace Api.DBAccess
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
-
-        public async Task<User> getUser(int userId)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        }
-
-
         /// <summary>
         /// Creates a user using entityframework core
         /// </summary>

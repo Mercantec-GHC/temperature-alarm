@@ -102,7 +102,7 @@ namespace Api.BusinessLogic
         /// <returns>returns the updated user in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> EditProfile(User user, int userId)
         {
-            return await _dbAccess.UpdateUser(userRequest, userId);
+            return await _dbAccess.UpdateUser(user, userId);
         }
 
         public async Task<IActionResult> changePassword(ChangePasswordRequest passwordRequest, int userId)

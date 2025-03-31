@@ -19,13 +19,15 @@ namespace Api.Controllers
         }
 
         //[Authorize]
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUSer(int userId)
+        [HttpGet("Get")]
+        public async Task<IActionResult> GetUSer()
         {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
             return await _userLogic.getUser(userId);
         }
-        [HttpPost("login")]
-        // Sends the login to userLogic
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {

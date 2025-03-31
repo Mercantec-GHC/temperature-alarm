@@ -68,13 +68,5 @@ namespace Api.Controllers
         {
             return await _deviceLogic.EditDevice(device, deviceId);
         }
-
-
-        [Authorize]
-        [HttpDelete("Delete/{referenceId}")]
-        public async Task<IActionResult> EditDevice(string referenceId)
-        {
-            return await _deviceLogic.EditDevice(referenceId);
-        }
     }
 }

@@ -1,10 +1,10 @@
-import { getDevicesOnUserId, deleteDevice, update, add } from "./services/devices.service.js";
+import { getDevices, deleteDevice, update, add } from "./services/devices.service.js";
 import { devices } from "../mockdata/devices.mockdata.js";
 
-let id = localStorage.getItem("id");
-// getDevicesOnUserId(id).then(res => {
-//     buildTable(res)
-// })
+getDevices().then(res => {
+    buildTable(res)
+})
+
 buildTable(devices);
 
 let selectedReferenceId = null; // Store the selected referenceId

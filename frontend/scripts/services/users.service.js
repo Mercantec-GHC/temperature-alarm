@@ -1,17 +1,8 @@
 import { request } from "../../shared/utils.js";
-import { address } from "../../shared/constants.js";
-import { handleResponse } from "../../shared/utils.js";
 
 
-export function get(userId) {
-    return fetch(`${address}/user/${userId}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        },
-    })
-    .then(handleResponse)
-    .catch(err => { error: err.message });
+export function get() {
+    return request("GET",`/user/get`)
 }
 
 export function login(usernameOrEmail, password) {
