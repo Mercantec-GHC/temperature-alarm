@@ -10,7 +10,7 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
     
     login(emailOrUsername, password)
         .then(response => {
-            document.cookie = `auth-token=${response.token}`;
+            document.cookie = `auth-token=${response.token}; Path=/`;
 
             localStorage.setItem("user", {
                 id: response.id,

@@ -3,13 +3,16 @@ import { address } from "./constants.js";
 export async function request(method, path, body = null) {
     const token = document.cookie.match(/\bauth-token=([^;\s]+)/);
 
+    const headers = {};
+    if (body)
+        headers["Content-Type"] = "application/json";
+    if (token?.length > 1)
+        headers["Authorization"] = `Bearer ${token[1]}`;
+
     return new Promise((resolve, reject) => {
         fetch(address + path, {
             method,
-            headers: {
-                "Content-Type": body ? "application/json" : undefined,
-                "Authorization": token?.length > 1 ? `Bearer ${token[1]}` : undefined,
-            },
+            headers,
             body: body ? JSON.stringify(body) : undefined,
         })
         .then(async response => {
