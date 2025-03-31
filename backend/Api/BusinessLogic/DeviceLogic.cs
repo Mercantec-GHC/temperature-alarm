@@ -1,7 +1,6 @@
 ﻿using Api.DBAccess;
 using Api.Models;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Api.BusinessLogic
 {
@@ -54,10 +53,12 @@ namespace Api.BusinessLogic
         /// <summary>
         /// Checks if the device exist that is trying to be read from
         /// Gets the logs and checks if there are any in the list
+        /// Checks if the datetimeRange have 2 values that are the same bc that means they want all logs
+        /// Then it makes a new list with all data that are in the range of the 2 datetimes
         /// </summary>
         /// <param name="deviceId">The deviceId that you want from the logs</param>
         /// <returns>returns the logs in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> GetLogs(int deviceId)
+        public async Task<IActionResult> GetLogs(DateTimeRange dateTimeRange, int deviceId)
         {
             var device = await _dbAccess.ReadDevice(deviceId);
 
@@ -67,7 +68,15 @@ namespace Api.BusinessLogic
 
             if (logs.Count == 0) { return new ConflictObjectResult(new { message = "Could not find any logs connected to the device" }); }
 
-            return new OkObjectResult(logs);
+            if (dateTimeRange.DateTimeStart == dateTimeRange.DateTimeEnd) { return new OkObjectResult(logs); }
+
+            List<TemperatureLogs> rangedLogs = new List<TemperatureLogs>();
+            foreach (var log in logs)
+            {
+                if (log.Date <= dateTimeRange.DateTimeStart && log.Date >= dateTimeRange.DateTimeEnd) { rangedLogs.Add(log); }
+            }
+
+            return new OkObjectResult(rangedLogs);
         }
 
         /// <summary>

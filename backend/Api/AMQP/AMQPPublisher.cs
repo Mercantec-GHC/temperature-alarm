@@ -1,9 +1,7 @@
 ﻿using Api.DBAccess;
 using Api.Models;
-using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 

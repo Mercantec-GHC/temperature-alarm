@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Api.Models;
-using Api.DBAccess;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Api.BusinessLogic;
 

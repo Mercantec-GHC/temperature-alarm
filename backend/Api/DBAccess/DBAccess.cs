@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Api.Models;
-using System.Text;
-using System.Runtime.Intrinsics.Arm;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Api.DBAccess
@@ -81,6 +77,7 @@ namespace Api.DBAccess
             return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
         }
 
+        // Updates the refreshtoken saved in DB
         public async void UpdatesRefreshToken(string refreshToken, int userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -190,14 +187,14 @@ namespace Api.DBAccess
 
             return new ConflictObjectResult(new { message = "Could not save to database" });
         }
-        
-        // Returns a device according to userID
+
+        // Returns a device according to deviceId
         public async Task<Device> ReadDevice(int deviceId)
         {
             return await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
         }
 
-        // Returns a device according to userID
+        // Returns a device according to refenreId
         public Device ReadDevice(string refenreId)
         {
             return _context.Devices.FirstOrDefault(d => d.ReferenceId == refenreId);

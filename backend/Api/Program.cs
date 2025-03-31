@@ -5,7 +5,6 @@ using Api.DBAccess;
 using Api.MQTTReciever;
 using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 class Program
 {

@@ -45,9 +45,9 @@ namespace Api.Controllers
         // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpGet("logs/{deviceId}")]
-        public async Task<IActionResult> GetLogs(int deviceId)
+        public async Task<IActionResult> GetLogs([FromBody] DateTimeRange dateTimeRange, int deviceId)
         {
-            return await _deviceLogic.GetLogs(deviceId);
+            return await _deviceLogic.GetLogs(dateTimeRange, deviceId);
         }
 
         // Sends the deviceId to deviceLogic
