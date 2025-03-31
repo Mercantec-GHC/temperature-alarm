@@ -10,27 +10,28 @@
     </head>
 
     <body>
-        <div id="container">
-            <div class="topnav">
-                <a class="active" href="/home/index.html">Home</a>
-                <div style="display: flex; justify-content: flex-end;">
-                    <a class="" href="/home/index.html">Devices</a>
-                    <a class="" href="/profile/index.html">Profile</a>
-                </div>
+        <div class="topnav">
+            <a class="active" href="/home/index.html">Home</a>
+            <div style="display: flex; justify-content: flex-end;">
+                <a class="" href="/home/index.html">Devices</a>
+                <a class="" href="/profile/index.html">Profile</a>
             </div>
-            <div class="chartContainer">
+        </div>
+        <div id="container">
+            <div class="chart-container">
                 <canvas id="myChart" style="width: 49%; height: 49%;"></canvas>
             </div>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Temperature</th>
-                    <th>Date</th>
-                    <th>TempHigh</th>
-                    <th>TempLow</th>
-                </tr>
-                <tbody id="TemperatureTable"></tbody>
-            </table>
+            <div id="table-wrapper">
+                <table>
+                    <tr>
+                        <th>Temperature</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Limits</th>
+                    </tr>
+                    <tbody id="TemperatureTable"></tbody>
+                </table>
+            </div>
         </div>
     </body>
 </html>
