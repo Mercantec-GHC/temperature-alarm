@@ -76,6 +76,8 @@ namespace Api.BusinessLogic
                 if (log.Date <= dateTimeRange.DateTimeStart && log.Date >= dateTimeRange.DateTimeEnd) { rangedLogs.Add(log); }
             }
 
+            if (rangedLogs.Count == 0) { return new ConflictObjectResult(new { message = "There is no logs for that periode" }); }
+
             return new OkObjectResult(rangedLogs);
         }
 
