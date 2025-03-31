@@ -45,8 +45,19 @@ namespace Api.Controllers
         // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpGet("logs/{deviceId}")]
-        public async Task<IActionResult> GetLogs([FromBody] DateTimeRange dateTimeRange, int deviceId)
+        public async Task<IActionResult> GetLogs(int deviceId, DateTime? dateTimeStart = null, DateTime? dateTimeEnd = null)
         {
+            DateTimeRange dateTimeRange = new DateTimeRange();
+            if (dateTimeStart != null && dateTimeEnd != null)
+            {
+                dateTimeRange.DateTimeStart = (DateTime)dateTimeStart;
+                dateTimeRange.DateTimeEnd= (DateTime)dateTimeEnd;
+            }
+            else
+            {
+                dateTimeRange.DateTimeStart = DateTime.Now;
+                dateTimeRange.DateTimeEnd = dateTimeRange.DateTimeStart;
+            }
             return await _deviceLogic.GetLogs(dateTimeRange, deviceId);
         }
 
