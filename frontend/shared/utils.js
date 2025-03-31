@@ -13,17 +13,19 @@ export async function request(method, path, body = null) {
             body: body ? JSON.stringify(body) : undefined,
         })
         .then(async response => {
-            const json = await response.json();
+            try {
+                const json = await response.json();
 
-            if (response.ok) return resolve(json);
+                if (response.ok) return resolve(json);
 
-            if (json.error) return reject(json.error);
+                if (json.error) return reject(json.error);
 
-            if (json.message) return reject(json.message);
+                if (json.message) return reject(json.message);
 
-            if (json.errors) return reject(Object.values(response.errors)[0][0]);
-
-            reject("Request failed with HTTP code " + response.status);
+                if (json.errors) return reject(Object.values(json.errors)[0][0]);
+            } finally {
+                reject("Request failed with HTTP code " + response.status);
+            }
         })
         .catch(err => reject(err.message));
     });

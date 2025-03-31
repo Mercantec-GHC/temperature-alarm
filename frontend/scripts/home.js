@@ -1,14 +1,14 @@
-import { mockTemperatureLogs } from "../mockdata/temperature-logs.mockdata.js"; // Import data
 import { getLogsOnDeviceId } from "./services/devices.service.js";
 
 async function buildChart() {
+	// TODO change device id
     const data = await getLogsOnDeviceId(1);
 
-    const xValues = mockTemperatureLogs.map((log) =>
+    const xValues = data.map((log) =>
         new Date(log.date).toLocaleString()
     ); // Full Date labels
-    const yValues = mockTemperatureLogs.map((log) => log.temperature); // Temperature values
-    buildTable(mockTemperatureLogs);
+    const yValues = data.map((log) => log.temperature); // Temperature values
+    buildTable(data);
     new Chart("myChart", {
         type: "line",
         data: {
