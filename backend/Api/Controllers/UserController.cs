@@ -3,7 +3,7 @@ using Api.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Api.BusinessLogic;
-using Api.Models.User;
+using Api.Models.Users;
 
 namespace Api.Controllers
 {

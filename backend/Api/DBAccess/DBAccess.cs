@@ -2,7 +2,8 @@
 using Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using Api.Models.User;
+using Api.Models.Devices;
+using Api.Models.Users;
 
 
 namespace Api.DBAccess

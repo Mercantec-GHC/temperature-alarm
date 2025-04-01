@@ -1,4 +1,6 @@
-﻿namespace Api.Models.User
+﻿using Api.Models.Devices;
+
+namespace Api.Models.Users
 {
     public class User
     {

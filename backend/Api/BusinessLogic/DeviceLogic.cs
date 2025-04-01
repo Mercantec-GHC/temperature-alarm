@@ -1,5 +1,6 @@
 ﻿using Api.DBAccess;
 using Api.Models;
+using Api.Models.Devices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.BusinessLogic
@@ -41,11 +42,21 @@ namespace Api.BusinessLogic
         /// <param name="device">The new device</param>
         /// <param name="userId">The user that owns the device</param>
         /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> AddDevice(Device device, int userId)
+        public async Task<IActionResult> AddDevice(string referenceId, int userId)
         {
             var profile = await _dbAccess.ReadUser(userId);
 
             if (profile == null) { return new ConflictObjectResult(new { message = "Could not find user" }); }
+
+            Device device = new Device
+            {
+                Name = "Undefined",
+                TempHigh = 0,
+                TempLow = 0,
+                ReferenceId = referenceId,
+                Logs = new List<TemperatureLogs>(),
+            };
+
 
             return await _dbAccess.CreateDevice(device, userId);
         }

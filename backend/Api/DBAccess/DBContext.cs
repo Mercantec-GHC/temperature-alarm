@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Api.Models;
-using Api.Models.User;
+using Api.Models.Users;
+using Api.Models.Devices;
 
 namespace Api
 {

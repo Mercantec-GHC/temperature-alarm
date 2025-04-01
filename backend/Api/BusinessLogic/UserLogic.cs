@@ -1,6 +1,7 @@
 ﻿using Api.DBAccess;
 using Api.Models;
-using Api.Models.User;
+using Api.Models.Devices;
+using Api.Models.Users;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

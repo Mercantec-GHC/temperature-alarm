@@ -1,4 +1,4 @@
-﻿namespace Api.Models.User
+﻿namespace Api.Models.Users
 {
     public class EditUserRequest
     {
