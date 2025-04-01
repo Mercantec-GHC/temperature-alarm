@@ -42,6 +42,9 @@ function buildTable(data) {
 
     data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+	// TODO allow showing more than 50 by e.g. clicking
+	data = data.slice(0, 50);
+
     data.forEach((log) => {
         var averageTemp = (log.tempHigh + log.tempLow) / 2.0;
         var color;
