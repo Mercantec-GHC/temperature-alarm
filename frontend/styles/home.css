@@ -2,7 +2,6 @@ body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #F9F9F9;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 #container {
@@ -46,10 +45,8 @@ table {
     width: 100%;
     background-color: white;
     color: #616161;
-  margin: 20px;
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 95%;
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
 }
 
 td,
@@ -114,10 +111,10 @@ table tr:not(:last-child) .temperature {
 }
 
 .chartContainer{
-  margin: 20px;
+    margin: 20px;
 }
 
 .tableConatiner{
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }

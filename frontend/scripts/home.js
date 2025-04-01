@@ -1,14 +1,12 @@
 import { logout } from "../shared/utils.js";
-import { getLogsOnDeviceId } from "./services/devices.service.js";
+import { getUser } from "../shared/utils.js";
+import { getDevices, getLogsOnDeviceId } from "./services/devices.service.js";
 
 async function buildChart(data) {
-    data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
     const xValues = data.map((log) =>
         new Date(log.date).toLocaleString()
     ); // Full Date labels
     const yValues = data.map((log) => log.temperature); // Temperature values
-    buildTable(data);
     new Chart("myChart", {
         type: "line",
         data: {
@@ -41,6 +39,9 @@ async function buildChart(data) {
 
 function buildTable(data) {
     var table = document.getElementById(`TemperatureTable`);
+
+    data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
     data.forEach((log) => {
         var averageTemp = (log.tempHigh + log.tempLow) / 2.0;
         var color;
@@ -73,15 +74,64 @@ function buildTable(data) {
     });
 }
 
-// TODO change device id
-getLogsOnDeviceId(1)
-    .then(buildChart)
-    .catch(err => {
-        document.getElementById("error").innerText = err;
-        document.getElementById("error").style.display = "block";
-        document.getElementById("container").style.display = "none";
+function handleError(err) {
+    document.getElementById("error").innerText = err;
+    document.getElementById("error").style.display = "block";
+    document.getElementById("container").style.display = "none";
+}
+
+async function init() {
+    const devices = await getDevices()
+        .catch(handleError);
+
+    const deviceData = [];
+
+    for (const device of devices) {
+        const data = await getLogsOnDeviceId(device.id)
+            .catch(handleError);
+
+        deviceData.push(data);
+    }
+
+    if (deviceData.length === 0) {
+        return;
+    }
+
+    buildTable(deviceData[0]);
+
+    new Chart("myChart", {
+        type: "line",
+        data: {
+            datasets: deviceData.map(dataset => ({
+                label: "Temperature",
+                fill: false,
+                lineTension: 0.4,
+                backgroundColor: "rgba(0,0,255,1.0)",
+                borderColor: "rgba(0,0,255,0.1)",
+                data: dataset.map(log => ({
+                    x: log.date,
+                    y: log.temperature,
+                })),
+            })),
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: item => `Temperature: ${item.formattedValue}°C`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    type: "time",
+                },
+            },
+        },
     });
+}
+
+init();
 
 document.querySelector(".logout-container").addEventListener("click", logout);
-
 

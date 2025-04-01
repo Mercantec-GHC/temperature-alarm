@@ -12,10 +12,10 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
         .then(response => {
             document.cookie = `auth-token=${response.token}; Path=/`;
 
-            localStorage.setItem("user", {
+            localStorage.setItem("user", JSON.stringify({
                 id: response.id,
                 username: response.userName,
-            });
+            }));
 
             location.href = "/home";
         })

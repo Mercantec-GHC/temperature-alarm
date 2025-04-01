@@ -25,6 +25,8 @@ export async function request(method, path, body = null) {
 
                 if (json.message) return reject(json.message);
 
+                if (json.title) return reject(json.title);
+
                 if (json.errors) return reject(Object.values(json.errors)[0][0]);
             } finally {
                 reject("Request failed with HTTP code " + response.status);
@@ -38,5 +40,9 @@ export function logout() {
 	localStorage.removeItem("user");
 	document.cookie = "auth-token=";
 	window.location.href = "/";
+}
+
+export function getUser() {
+    return JSON.parse(localStorage.getItem("user"));
 }
 
