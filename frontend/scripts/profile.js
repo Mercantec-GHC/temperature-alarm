@@ -4,76 +4,95 @@ import { get } from "./services/users.service.js";
 import { update } from "./services/users.service.js";
 import { updatePassword } from "./services/users.service.js";
 
-let id = localStorage.getItem("id");
+var username;
+var email;
 
-get(id).then(res => {
-    var table = document.getElementById(`profileCard`);
-table.innerHTML += `
+get().then((res) => {
+  username = res.userName;
+  email = res.email;
+  var table = document.getElementById(`profileCard`);
+  table.innerHTML += `
     <div class="pfp">
         <img style="width:200px; height:200px" src="${profileData.pfp}">
     </div>
     <div class="userData">
-        <h2>${res.userName}</h2>
-        <h2>${res.email}</h2>
+        <h2>${username}</h2>
+        <h2>${email}</h2>
     </div>
 </div>`;
-})
+});
 
+const checkForChanges = () => {
+    if (emailInput.value !== email || usernameInput.value !== username) {
+        submitBtn.disabled = false; // Enable button if changes were made
+    } else {
+        submitBtn.disabled = true; // Disable button if no changes
+    }
+};
 
-
+const emailInput = document.getElementById("email");
+const usernameInput = document.getElementById("uname");
+const submitBtn = document.getElementById("submitEditBtn");
 var pswModal = document.getElementById("PasswordModal");
 var editModal = document.getElementById("editModal");
 var editIconbtn = document.getElementById("openEditModal");
 var passwordBtn = document.getElementById("openPasswordModal");
 
+emailInput.addEventListener("input", checkForChanges);
+usernameInput.addEventListener("input", checkForChanges);
+
 // Open modals
-editIconbtn.onclick = () => (editModal.style.display = "block");
+editIconbtn.onclick = () => {
+  document.getElementById("uname").value = username;
+  document.getElementById("email").value = email;
+  submitBtn.disabled = true;
+  editModal.style.display = "block";
+};
 passwordBtn.onclick = () => (pswModal.style.display = "block");
 
 // Close modals when clicking on any close button
-document.querySelectorAll(".close").forEach(closeBtn => {
-    closeBtn.onclick = () => {
-        pswModal.style.display = "none";
-        editModal.style.display = "none";
-        document.getElementById("form-error").innerText = "";
-        document.getElementById("form-error").style.display = "none";
-    };
+document.querySelectorAll(".close").forEach((closeBtn) => {
+  closeBtn.onclick = () => {
+    pswModal.style.display = "none";
+    editModal.style.display = "none";
+    document.getElementById("form-error").innerText = "";
+    document.getElementById("form-error").style.display = "none";
+  };
 });
 
 // Close modals when clicking outside
 window.onclick = (event) => {
-    if (event.target == pswModal || event.target == editModal) {
-        pswModal.style.display = "none";
-        editModal.style.display = "none";
-        document.getElementById("form-error").innerText = "";
-        document.getElementById("form-error").style.display = "none";
-    }
+  if (event.target == pswModal || event.target == editModal) {
+    pswModal.style.display = "none";
+    editModal.style.display = "none";
+    document.getElementById("form-error").innerText = "";
+    document.getElementById("form-error").style.display = "none";
+  }
 };
 
-document.getElementById("editForm").addEventListener("submit", function(event) {
+document
+  .getElementById("editForm")
+  .addEventListener("submit", function (event) {
     event.preventDefault(); // Prevents default form submission
 
     document.getElementById("form-error").style.display = "none";
 
-    // Get form values
-    const email = document.getElementById("email").value;
-    const username = document.getElementById("uname").value;
-
     // Call function with form values
-    update(email, username, id)
-        .then(response => {
-            if (response?.error) {
-                document.getElementById("form-error").innerText = response.error;
-                document.getElementById("form-error").style.display = "block";
+    update(emailInput.value, usernameInput.value).then((response) => {
+      if (response?.error) {
+        document.getElementById("form-error").innerText = response.error;
+        document.getElementById("form-error").style.display = "block";
 
-                return;
-            }
+        return;
+      }
 
-            location.href = "/profile";
-        });
-});
+      location.href = "/profile";
+    });
+  });
 
-document.getElementById("PasswordForm").addEventListener("submit", function(event) {
+document
+  .getElementById("PasswordForm")
+  .addEventListener("submit", function (event) {
     event.preventDefault(); // Prevents default form submission
 
     document.getElementById("form-error").style.display = "none";
@@ -83,22 +102,20 @@ document.getElementById("PasswordForm").addEventListener("submit", function(even
     const repeatPassword = document.getElementById("rpsw").value;
 
     if (newPassword !== repeatPassword) {
-        let errorDiv = document.getElementById("form-error");
-        errorDiv.style.display = "block"; 
-        errorDiv.innerText = "Passwords do not match!";
-        return;
+      let errorDiv = document.getElementById("form-error");
+      errorDiv.style.display = "block";
+      errorDiv.innerText = "Passwords do not match!";
+      return;
     }
 
-    updatePassword(oldPassword, newPassword, id)
-        .then(response => {
-            //error messages do not work
-            if (response.error) {
-                document.getElementById("form-error").innerText = response.message;
-                document.getElementById("form-error").style.display = "block";
-                return;
-            }
-        });
-});
+    updatePassword(oldPassword, newPassword).then((response) => {
+      //error messages do not work
+      if (response.error) {
+        document.getElementById("form-error").innerText = response.message;
+        document.getElementById("form-error").style.display = "block";
+        return;
+      }
+    });
+  });
 
 document.querySelector(".logout-container").addEventListener("click", logout);
-

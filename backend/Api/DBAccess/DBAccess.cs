@@ -99,7 +99,7 @@ namespace Api.DBAccess
         /// <param name="user">Contains the updated user info</param>
         /// <param name="userId">Has the id for the user that is to be updated</param>
         /// <returns>returns the updated user in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> UpdateUser(User user, int userId)
+        public async Task<IActionResult> UpdateUser(EditUserRequest user, int userId)
         {
             var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var users = await _context.Users.ToListAsync();
@@ -119,11 +119,14 @@ namespace Api.DBAccess
                 }
             }
 
-            if(user.Email != "" && user.Email != null)
-                profile.Email = user.Email;
+            if(user.Email == "" || user.Email == null)
+                return new ConflictObjectResult(new { message = "Please enter an email" });
 
-            if (user.UserName != "" && user.UserName != null)
-                profile.UserName = user.UserName;
+            if (user.UserName == "" || user.UserName == null)
+                return new ConflictObjectResult(new { message = "Please enter a username" });
+
+            profile.Email = user.Email;
+            profile.UserName = user.UserName;
 
 
 

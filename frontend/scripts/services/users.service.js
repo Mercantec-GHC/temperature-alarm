@@ -22,14 +22,14 @@ export function create(email, username, password, repeatPassword){
 }
 
 export function update(email, username){
-    return request("PATCH", "/user/update", {
+    return request("PUT", "/user/update", {
         email,
         username,
     });
 }
 
 export function updatePassword(oldPassword, newPassword){
-    return request("PATCH", "/user/update-password", {
+    return request("PUT", "/user/update-password", {
         oldPassword,
         newPassword,
     });

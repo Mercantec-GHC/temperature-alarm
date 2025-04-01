@@ -41,15 +41,26 @@ namespace Api.Controllers
             return await _userLogic.RegisterUser(user);
         }
 
-        // Sends the user and userId to userLogic
         [Authorize]
-        [HttpPut("Edit")]
-        public async Task<IActionResult> EditUser([FromBody] User user)
+        [HttpPut("change-password")]
+        public async Task<IActionResult> changePassword([FromBody] ChangePasswordRequest passwordRequest)
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userId = Convert.ToInt32(userIdString);
-            return await _userLogic.EditProfile(user, userId);
+            return await _userLogic.changePassword(passwordRequest, userId);
+        }
+
+
+        // Sends the user and userId to userLogic
+        [Authorize]
+        [HttpPut("Update")]
+        public async Task<IActionResult> EditUser([FromBody] EditUserRequest userRequest)
+        {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
+            return await _userLogic.EditProfile(userRequest, userId);
         }
 
         // Sends the userId to userLogic
