@@ -42,8 +42,8 @@ function buildTable(data) {
 
     data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-	// TODO allow showing more than 50 by e.g. clicking
-	data = data.slice(0, 50);
+    // TODO allow showing more than 50 by e.g. clicking
+    data = data.slice(0, 50);
 
     data.forEach((log) => {
         var averageTemp = (log.tempHigh + log.tempLow) / 2.0;
@@ -115,10 +115,10 @@ async function init() {
                     x: new Date(log.date).getTime(),
                     y: log.temperature,
                 })),
-                parsing: false,
             })),
         },
         options: {
+            parsing: false,
             plugins: {
                 tooltip: {
                     callbacks: {
@@ -127,6 +127,8 @@ async function init() {
                 },
                 decimation: {
                     enabled: true,
+                    algorithm: "lttb",
+                    samples: window.innerWidth / 2,
                 },
             },
             scales: {
