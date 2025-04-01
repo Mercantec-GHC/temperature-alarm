@@ -15,31 +15,35 @@ export async function request(method, path, body = null) {
             headers,
             body: body ? JSON.stringify(body) : undefined,
         })
-        .then(async response => {
-            try {
-                const json = await response.json();
+            .then(async response => {
+                if (response.status === 401) {
+                    location.href = "/login";
+                }
 
-                if (response.ok) return resolve(json);
+                try {
+                    const json = await response.json();
 
-                if (json.error) return reject(json.error);
+                    if (response.ok) return resolve(json);
 
-                if (json.message) return reject(json.message);
+                    if (json.error) return reject(json.error);
 
-                if (json.title) return reject(json.title);
+                    if (json.message) return reject(json.message);
 
-                if (json.errors) return reject(Object.values(json.errors)[0][0]);
-            } finally {
-                reject("Request failed with HTTP code " + response.status);
-            }
-        })
-        .catch(err => reject(err.message));
+                    if (json.title) return reject(json.title);
+
+                    if (json.errors) return reject(Object.values(json.errors)[0][0]);
+                } finally {
+                    reject("Request failed with HTTP code " + response.status);
+                }
+            })
+            .catch(err => reject(err.message));
     });
 }
 
 export function logout() {
-	localStorage.removeItem("user");
-	document.cookie = "auth-token=";
-	window.location.href = "/";
+    localStorage.removeItem("user");
+    document.cookie = "auth-token=";
+    window.location.href = "/";
 }
 
 export function getUser() {
