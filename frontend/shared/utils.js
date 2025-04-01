@@ -50,3 +50,7 @@ export function getUser() {
     return JSON.parse(localStorage.getItem("user"));
 }
 
+export function isLoggedIn() {
+    return document.cookie.match(/\bauth-token=/) && localStorage.getItem("user");
+}
+
