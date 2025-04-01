@@ -69,5 +69,16 @@ namespace Api.Controllers
         {
             return await _deviceLogic.EditDevice(device, deviceId);
         }
+
+        // Sends the userId to userLogic
+        [Authorize]
+        [HttpDelete("Delete/{referenceId}")]
+        public async Task<IActionResult> DeleteUser(string referenceId)
+        {
+            var claims = HttpContext.User.Claims;
+            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userId = Convert.ToInt32(userIdString);
+            return await _deviceLogic.DeleteDevice(referenceId, userId);
+        }
     }
 }

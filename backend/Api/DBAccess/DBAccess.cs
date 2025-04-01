@@ -205,8 +205,6 @@ namespace Api.DBAccess
 
             if (user == null || user.Devices == null) { return new ConflictObjectResult(new { message = "User did not have a device list" }); }
 
-            if (device.Logs == null) { device.Logs = new List<TemperatureLogs>(); }
-
             user.Devices.Add(device);
 
             bool saved = await _context.SaveChangesAsync() == 1;
@@ -223,9 +221,57 @@ namespace Api.DBAccess
         }
 
         // Returns a device according to refenreId
-        public Device ReadDevice(string refenreId)
+        public Device ReadDevice(string referenceId)
         {
-            return _context.Devices.FirstOrDefault(d => d.ReferenceId == refenreId);
+            return _context.Devices.FirstOrDefault(d => d.ReferenceId == referenceId);
+        }
+
+        public async Task<IActionResult> EditDevice(EditDeviceRequest request, string referenceId)
+        {
+            var device = await _context.Devices.FirstOrDefaultAsync(d => d.ReferenceId == referenceId);
+            if (device != null)
+            {
+                if (device.Name == "" || device.Name == null)
+                    return new ConflictObjectResult(new { message = "Please enter a name" });
+
+                device.Name = request.Name;
+                device.TempLow = request.TempLow;
+                device.TempHigh = request.TempHigh;
+
+                bool saved = await _context.SaveChangesAsync() >= 0;
+
+                if (saved) { return new OkObjectResult(saved); }
+
+                return new ConflictObjectResult(new { message = "Could not save to database" });
+            }
+            return new ConflictObjectResult(new { message = "Invalid device. May already be deleted" });
+        }
+
+        public async Task<IActionResult> DeleteDevice(string referenceId, int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Devices)  // Ensure devices are loaded
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return new NotFoundObjectResult(new { message = "User not found" });
+            }
+
+            var device = user.Devices?.FirstOrDefault(d => d.ReferenceId == referenceId);
+
+            if (device != null || user.Devices != null)
+            {
+                user.Devices.Remove(device);
+                _context.Devices.Remove(device);
+                bool saved = await _context.SaveChangesAsync() > 0;
+
+                if (saved) return new OkObjectResult(new { message = "Device deleted successfully" });
+
+                return new ConflictObjectResult(new { message = "Could not save to database" });
+            }
+
+            return new NotFoundObjectResult(new { message = "Device not found or already deleted" });
         }
 
         // Returns all devices

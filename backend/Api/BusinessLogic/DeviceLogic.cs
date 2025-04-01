@@ -1,6 +1,7 @@
 ﻿using Api.DBAccess;
 using Api.Models;
 using Api.Models.Devices;
+using Api.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.BusinessLogic
@@ -103,6 +104,17 @@ namespace Api.BusinessLogic
             if (device1 == null) { return new ConflictObjectResult(new { message = "Could not find device" }); }
 
             return await _dbAccess.UpdateDevice(device, deviceId);
+        }
+
+        /// <summary>
+        /// deletes a device
+        /// </summary>
+        /// <param name="referenceId">the id used to delete</param>
+        /// <param name="userId">Used for deleting device from devices list in user</param>
+        /// <returns>returns OK</returns>
+        public async Task<IActionResult> DeleteDevice(string referenceId, int userId)
+        {
+            return await _dbAccess.DeleteDevice(referenceId, userId);
         }
     }
 }

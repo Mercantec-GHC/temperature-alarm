@@ -1,3 +1,4 @@
+import { add } from "./services/devices.service.js";
 import { devices } from "../mockdata/devices.mockdata.js";
 import { logout } from "../shared/utils.js";
 
@@ -83,8 +84,8 @@ document.getElementById("editbtn").onclick = () => {
     const tempHigh = document.getElementById("tempHigh").value;
     const tempLow = document.getElementById("tempLow").value;
 
-    update(selectedReferenceId, name, tempHigh, tempLow); // Call delete function with referenceId
-      document.getElementById("deleteModal").style.display = "none";
+    update(name, tempHigh, tempLow, selectedReferenceId); // Call delete function with referenceId
+      document.getElementById("editModal").style.display = "none";
       window.location.reload();
   }
 };
