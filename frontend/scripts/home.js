@@ -1,3 +1,4 @@
+import { logout } from "../shared/utils.js";
 import { getLogsOnDeviceId } from "./services/devices.service.js";
 
 async function buildChart(data) {
@@ -80,4 +81,7 @@ getLogsOnDeviceId(1)
         document.getElementById("error").style.display = "block";
         document.getElementById("container").style.display = "none";
     });
+
+document.querySelector(".logout-container").addEventListener("click", logout);
+
 

@@ -34,9 +34,9 @@ export async function request(method, path, body = null) {
     });
 }
 
-document.querySelectorAll(".logoutContainer").forEach(closeBtn => {
-    closeBtn.onclick = () => {
-        localStorage.clear();
-        window.location.href = "/index.html";
-    };
-});
+export function logout() {
+	localStorage.removeItem("user");
+	document.cookie = "auth-token=";
+	window.location.href = "/";
+}
+

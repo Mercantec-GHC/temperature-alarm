@@ -1,5 +1,6 @@
 import { getDevices, deleteDevice, update, add } from "./services/devices.service.js";
 import { devices } from "../mockdata/devices.mockdata.js";
+import { logout } from "../shared/utils.js";
 
 getDevices().then(res => {
     buildTable(res)
@@ -88,3 +89,6 @@ document.getElementById("editbtn").onclick = () => {
       window.location.reload();
   }
 };
+
+document.querySelector(".logout-container").addEventListener("click", logout);
+

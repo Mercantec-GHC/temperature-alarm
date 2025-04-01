@@ -1,4 +1,5 @@
 import { profileData } from "../mockdata/profile.mockdata.js";
+import { logout } from "../shared/utils.js";
 import { get } from "./services/users.service.js";
 import { update } from "./services/users.service.js";
 import { updatePassword } from "./services/users.service.js";
@@ -98,3 +99,6 @@ document.getElementById("PasswordForm").addEventListener("submit", function(even
             }
         });
 });
+
+document.querySelector(".logout-container").addEventListener("click", logout);
+
