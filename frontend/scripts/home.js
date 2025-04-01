@@ -109,9 +109,10 @@ async function init() {
                 backgroundColor: "rgba(0,0,255,1.0)",
                 borderColor: "rgba(0,0,255,0.1)",
                 data: dataset.map(log => ({
-                    x: log.date,
+                    x: new Date(log.date).getTime(),
                     y: log.temperature,
                 })),
+                parsing: false,
             })),
         },
         options: {
@@ -120,6 +121,9 @@ async function init() {
                     callbacks: {
                         label: item => `Temperature: ${item.formattedValue}°C`,
                     },
+                },
+                decimation: {
+                    enabled: true,
                 },
             },
             scales: {
