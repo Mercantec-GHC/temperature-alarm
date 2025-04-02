@@ -2,40 +2,7 @@ import { logout } from "../shared/utils.js";
 import { getUser } from "../shared/utils.js";
 import { getDevices, getLogsOnDeviceId } from "./services/devices.service.js";
 
-async function buildChart(data) {
-    const xValues = data.map((log) =>
-        new Date(log.date).toLocaleString()
-    ); // Full Date labels
-    const yValues = data.map((log) => log.temperature); // Temperature values
-    new Chart("myChart", {
-        type: "line",
-        data: {
-            labels: xValues,
-            datasets: [
-                {
-                    label: "Temperature",
-                    fill: false,
-                    lineTension: 0.4,
-                    backgroundColor: "rgba(0,0,255,1.0)",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: yValues,
-                },
-            ],
-        },
-        options: {
-            tooltips: {
-                callbacks: {
-                    title: function (tooltipItem) {
-                        return `Date: ${tooltipItem[0].label}`;
-                    },
-                    label: function (tooltipItem) {
-                        return `Temperature: ${tooltipItem.value}°C`;
-                    },
-                },
-            },
-        },
-    });
-}
+let chart;
 
 const TABLE_PAGINATION_SIZE = 30;
 
@@ -108,7 +75,12 @@ function randomColorChannelValue() {
     return Math.floor(Math.random() * 256);
 }
 
-async function fetchData(startDate = null, endDate = null) {
+async function fetchData() {
+    document.body.classList.add("loading");
+
+    const startDate = document.getElementById("period-start").valueAsDate?.toISOString();
+    const endDate = document.getElementById("period-end").valueAsDate?.toISOString();
+
     const devices = await getDevices()
         .catch(handleError);
 
@@ -117,7 +89,7 @@ async function fetchData(startDate = null, endDate = null) {
     for (const device of devices) {
         addDeviceToDropdown(device);
 
-        const data = await getLogsOnDeviceId(device.id)
+        const data = await getLogsOnDeviceId(device.id, startDate, endDate)
             .catch(handleError);
 
         deviceData.push(data);
@@ -129,52 +101,86 @@ async function fetchData(startDate = null, endDate = null) {
 
     buildTable(deviceData[0]);
 
-    new Chart("myChart", {
-        type: "line",
-        data: {
-            datasets: deviceData.map((dataset, i) => {
-                const color = new Array(3)
-                    .fill(null)
-                    .map(randomColorChannelValue)
-                    .join(",");
-
-                return {
-                    label: devices[i].name,
-                    fill: false,
-                    lineTension: 0.4,
-                    backgroundColor: `rgba(${color}, 1.0)`,
-                    borderColor: `rgba(${color}, 0.1)`,
-                    data: dataset.map(log => ({
-                        x: new Date(log.date).getTime(),
-                        y: log.temperature,
-                    })),
-                };
-            }),
-        },
-        options: {
-            parsing: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: item => `Temperature: ${item.formattedValue}°C`,
+    if (!chart) {
+        chart = new Chart("chart", {
+            type: "line",
+            data: {
+                datasets: [],
+            },
+            options: {
+                responsive: false,
+                parsing: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: item => `Temperature: ${item.formattedValue}°C`,
+                        },
+                    },
+                    decimation: {
+                        enabled: true,
+                        algorithm: "lttb",
+                        samples: window.innerWidth / 2,
                     },
                 },
-                decimation: {
-                    enabled: true,
-                    algorithm: "lttb",
-                    samples: window.innerWidth / 2,
+                scales: {
+                    x: {
+                        type: "time",
+                    },
                 },
             },
-            scales: {
-                x: {
-                    type: "time",
-                },
-            },
-        },
+        });
+    }
+
+    chart.data.datasets = deviceData.map((dataset, i) => {
+        const color = new Array(3)
+            .fill(null)
+            .map(randomColorChannelValue)
+            .join(",");
+
+        return {
+            label: devices[i].name,
+            fill: false,
+            lineTension: 0.4,
+            backgroundColor: `rgba(${color}, 1.0)`,
+            borderColor: `rgba(${color}, 0.1)`,
+            data: dataset.map(log => ({
+                x: new Date(log.date).getTime(),
+                y: log.temperature,
+            })),
+        };
     });
+
+    chart.update();
+
+    document.body.classList.remove("loading");
 }
 
-fetchData();
+function setPeriod(start, end) {
+    document.getElementById("period-start").valueAsDate = start && new Date(start);
+    document.getElementById("period-end").valueAsDate = start && new Date(end);
+
+    fetchData();
+}
+
+function setPeriodLastDays(days) {
+    const start = new Date()
+    start.setDate(new Date().getDate() - days);
+    start.setHours(0, 0, 0, 0);
+    setPeriod(start, new Date().setHours(23, 59, 0, 0));
+}
+
+for (const elem of document.getElementsByClassName("last-x-days")) {
+    elem.onclick = event => setPeriodLastDays(event.target.dataset.days);
+}
+
+for (const elem of document.querySelectorAll("#period-start, #period-end")) {
+    elem.onchange = fetchData;
+}
+
+document.getElementById("all-time").onclick = () => setPeriod(null, null);
 
 document.querySelector(".logout-container").addEventListener("click", logout);
+
+setPeriodLastDays(3);
+fetchData();
 

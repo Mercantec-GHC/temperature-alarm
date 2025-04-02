@@ -16,6 +16,7 @@ export function update(name, temphigh, tempLow, referenceId) {
     return request("PUT", "/device/edit", {name: name, temphigh: temphigh, tempLow: tempLow, referenceId: referenceId});
 }
 
-export function getLogsOnDeviceId(id) {
-    return request("GET", `/device/logs/${id}`);
+export function getLogsOnDeviceId(id, startDate = null, endDate = null) {
+    const query = startDate && endDate ? `?dateTimeStart=${startDate}&dateTimeEnd=${endDate}` : "";
+    return request("GET", `/device/logs/${id}${query}`);
 }
