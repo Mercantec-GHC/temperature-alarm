@@ -311,16 +311,15 @@ namespace Api.DBAccess
         /// Returns the logs from the device
         /// </summary>
         /// <param name="deviceId">Has the id for the device that the los belong too</param>
+        /// <param name="range">Return only logs within the specified datetime range</param>
         /// <returns></returns>
-        public async Task<List<TemperatureLogs>> ReadLogs(int deviceId)
+        public async Task<List<TemperatureLogs>> ReadLogs(int deviceId, DateTimeRange range)
         {
-            var device = await _context.Devices.Include(d => d.Logs).FirstOrDefaultAsync(d => d.Id == deviceId);
-
-            if (device == null || device.Logs == null) { return new List<TemperatureLogs>(); }
-
-            var logs = device.Logs;
-
-            return logs;
+            return _context.TemperatureLogs
+                .Where(log => log.DeviceId == deviceId)
+                .Where(log => log.Date > range.DateTimeStart)
+                .Where(log => log.Date < range.DateTimeEnd)
+                .ToList();
         }
 
         /// <summary>
