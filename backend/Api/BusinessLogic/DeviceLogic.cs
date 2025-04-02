@@ -85,7 +85,7 @@ namespace Api.BusinessLogic
             List<TemperatureLogs> rangedLogs = new List<TemperatureLogs>();
             foreach (var log in logs)
             {
-                if (log.Date <= dateTimeRange.DateTimeStart && log.Date >= dateTimeRange.DateTimeEnd) { rangedLogs.Add(log); }
+                if (log.Date >= dateTimeRange.DateTimeStart && log.Date <= dateTimeRange.DateTimeEnd) { rangedLogs.Add(log); }
             }
 
             return new OkObjectResult(rangedLogs);
