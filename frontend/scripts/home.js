@@ -37,15 +37,14 @@ async function buildChart(data) {
     });
 }
 
-function buildTable(data) {
-    var table = document.getElementById(`TemperatureTable`);
+const TABLE_PAGINATION_SIZE = 30;
 
+function buildTable(data, offset = 0) {
     data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    // TODO allow showing more than 50 by e.g. clicking
-    data = data.slice(0, 50);
+    const page = data.slice(offset, offset + TABLE_PAGINATION_SIZE);
 
-    data.forEach((log) => {
+    page.forEach(log => {
         var averageTemp = (log.tempHigh + log.tempLow) / 2.0;
         var color;
         if (log.temperature >= log.tempHigh) {
@@ -66,7 +65,7 @@ function buildTable(data) {
         const date = new Date(log.date).toLocaleDateString();
         const time = new Date(log.date).toLocaleTimeString();
 
-        table.innerHTML += `
+        document.getElementById("table-body").innerHTML += `
             <tr>
                 <td class="temperature ${color}">${log.temperature}&deg;C</td>
                 <td>${date}</td>
@@ -75,6 +74,21 @@ function buildTable(data) {
             </tr>
         `;
     });
+
+    document.getElementById("shown-log-amount").innerText = Math.min(data.length, offset + TABLE_PAGINATION_SIZE);
+    document.getElementById("total-log-amount").innerText = data.length;
+
+    if (offset + TABLE_PAGINATION_SIZE >= data.length) {
+        document.getElementById("view-more").style.display = "none";
+
+        return;
+    }
+
+    document.getElementById("view-more").style.display = "block";
+
+    document.getElementById("view-more").onclick = () => {
+        buildTable(data, offset + TABLE_PAGINATION_SIZE);
+    }
 }
 
 function handleError(err) {
@@ -83,7 +97,7 @@ function handleError(err) {
     document.getElementById("container").style.display = "none";
 }
 
-async function init() {
+async function fetchData(startDate = null, endDate = null) {
     const devices = await getDevices()
         .catch(handleError);
 
@@ -140,7 +154,7 @@ async function init() {
     });
 }
 
-init();
+fetchData();
 
 document.querySelector(".logout-container").addEventListener("click", logout);
 

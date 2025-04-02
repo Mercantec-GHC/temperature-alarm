@@ -8,30 +8,6 @@ body {
     margin: 0 2rem;
 }
 
-.topnav {
-    overflow: hidden;
-    background-color: #333;
-}
-
-.topnav a {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-}
-
-.topnav a:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-.topnav a.active {
-    background-color: #04aa6d;
-    color: white;
-}
-
 #table-wrapper {
     overflow: hidden;
     border-radius: 8px;
@@ -110,11 +86,21 @@ table tr:not(:last-child) .temperature {
     margin: 2rem;
 }
 
-.chartContainer{
-    margin: 20px;
+#view-more {
+    display: none;
+    text-align: center;
+    padding: 0.5rem;
+    color: #616161;
+    background-color: white;
+    cursor: pointer;
+    transition-duration: 100ms;
 }
 
-.tableConatiner{
-    display: flex;
-    justify-content: center;
+#view-more:hover {
+    color: #212121;
 }
+
+#view-more:active {
+    background-color: #FCFCFC;
+}
+

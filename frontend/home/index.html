@@ -30,14 +30,21 @@
             </div>
             <div id="table-wrapper">
                 <table>
-                    <tr>
-                        <th>Temperature</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Limits</th>
-                    </tr>
-                    <tbody id="TemperatureTable"></tbody>
+                    <thead>
+                        <tr>
+                            <th>Temperature</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Limits</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
                 </table>
+
+                <div id="view-more">
+                    &#9660; View more
+                    (Showing <span id="shown-log-amount"></span>/<span id="total-log-amount"></span>)
+                </div>
             </div>
         </div>
         <div id="error" class="error"></div>
