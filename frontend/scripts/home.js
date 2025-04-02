@@ -78,8 +78,8 @@ function randomColorChannelValue() {
 async function fetchData() {
     document.body.classList.add("loading");
 
-    const startDate = document.getElementById("period-start").valueAsDate?.toISOString();
-    const endDate = document.getElementById("period-end").valueAsDate?.toISOString();
+    const startDate = document.getElementById("period-start").value;
+    const endDate = document.getElementById("period-end").value;
 
     const deviceData = [];
 
@@ -154,8 +154,14 @@ async function fetchData() {
 }
 
 function setPeriod(start, end) {
-    document.getElementById("period-start").valueAsDate = start && new Date(start);
-    document.getElementById("period-end").valueAsDate = start && new Date(end);
+    const startDate = start && new Date(start);
+    startDate?.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
+
+    const endDate = start && new Date(end);
+    endDate?.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
+
+    document.getElementById("period-start").value = startDate?.toISOString().slice(0, 16);
+    document.getElementById("period-end").value = endDate?.toISOString().slice(0, 16);
 
     fetchData();
 }
