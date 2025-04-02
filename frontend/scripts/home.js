@@ -81,9 +81,6 @@ async function fetchData() {
     const startDate = document.getElementById("period-start").valueAsDate?.toISOString();
     const endDate = document.getElementById("period-end").valueAsDate?.toISOString();
 
-    const devices = await getDevices()
-        .catch(handleError);
-
     const deviceData = [];
 
     for (const device of devices) {
@@ -99,6 +96,7 @@ async function fetchData() {
         return;
     }
 
+    document.getElementById("table-body").innerHTML = "";
     buildTable(deviceData[0]);
 
     if (!chart) {
@@ -180,6 +178,8 @@ for (const elem of document.querySelectorAll("#period-start, #period-end")) {
 document.getElementById("all-time").onclick = () => setPeriod(null, null);
 
 document.querySelector(".logout-container").addEventListener("click", logout);
+
+const devices = await getDevices().catch(handleError);
 
 setPeriodLastDays(3);
 fetchData();
