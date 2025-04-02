@@ -97,6 +97,17 @@ function handleError(err) {
     document.getElementById("container").style.display = "none";
 }
 
+function addDeviceToDropdown(device) {
+    const opt = document.createElement("option");
+    opt.innerText = `${device.name} (${device.referenceId})`;
+    opt.value = device.id;
+    document.getElementById("device-selector").appendChild(opt);
+}
+
+function randomColorChannelValue() {
+    return Math.floor(Math.random() * 256);
+}
+
 async function fetchData(startDate = null, endDate = null) {
     const devices = await getDevices()
         .catch(handleError);
@@ -104,6 +115,8 @@ async function fetchData(startDate = null, endDate = null) {
     const deviceData = [];
 
     for (const device of devices) {
+        addDeviceToDropdown(device);
+
         const data = await getLogsOnDeviceId(device.id)
             .catch(handleError);
 
@@ -119,17 +132,24 @@ async function fetchData(startDate = null, endDate = null) {
     new Chart("myChart", {
         type: "line",
         data: {
-            datasets: deviceData.map(dataset => ({
-                label: "Temperature",
-                fill: false,
-                lineTension: 0.4,
-                backgroundColor: "rgba(0,0,255,1.0)",
-                borderColor: "rgba(0,0,255,0.1)",
-                data: dataset.map(log => ({
-                    x: new Date(log.date).getTime(),
-                    y: log.temperature,
-                })),
-            })),
+            datasets: deviceData.map((dataset, i) => {
+                const color = new Array(3)
+                    .fill(null)
+                    .map(randomColorChannelValue)
+                    .join(",");
+
+                return {
+                    label: devices[i].name,
+                    fill: false,
+                    lineTension: 0.4,
+                    backgroundColor: `rgba(${color}, 1.0)`,
+                    borderColor: `rgba(${color}, 0.1)`,
+                    data: dataset.map(log => ({
+                        x: new Date(log.date).getTime(),
+                        y: log.temperature,
+                    })),
+                };
+            }),
         },
         options: {
             parsing: false,
