@@ -7,7 +7,7 @@ using Api.Models.Users;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Generic;
 
-
+//All EF Core database calls
 namespace Api.DBAccess
 {
     public class DbAccess
@@ -18,82 +18,71 @@ namespace Api.DBAccess
         {
             _context = context;
         }
-
-        public async Task<User> getUser(int userId)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        }
-
         /// <summary>
-        /// Creates a user using entityframework core
+        /// Gets one user on id
         /// </summary>
-        /// <param name="user">Need the entire user obj</param>
-        /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> CreateUser(User user)
-        {
-            var users = await _context.Users.ToListAsync();
-
-            foreach (var item in users)
-            {
-                if (item.UserName == user.UserName)
-                {
-                    return new ConflictObjectResult(new { message = "Username is already in use." });
-                }
-
-                if (item.Email == user.Email)
-                {
-                    return new ConflictObjectResult(new { message = "Email is being used already" });
-                }
-            }
-
-            _context.Users.Add(user);
-            bool saved = await _context.SaveChangesAsync() == 1;
-
-            if (saved) { return new OkObjectResult(true); }
-
-            return new ConflictObjectResult(new { message = "Could not save to databse" });
-        }
-
-        /// <summary>
-        /// Returns a user that matches either the email or username
-        /// </summary>
-        /// <param name="login">Has a username or email and a password here the password is not used</param>
-        /// <returns>(user) that matches the login</returns>
-        public async Task<User> Login(Login login)
-        {
-            User user = new User();
-            if (!login.EmailOrUsrn.Contains("@"))
-            {
-                user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == login.EmailOrUsrn);
-            }
-            else
-            {
-                user = await _context.Users.FirstOrDefaultAsync(u => u.Email == login.EmailOrUsrn);
-            }
-
-            if (user == null || user.Id == 0) { return new User(); }
-            return user;
-        }
-
-        // Returns a user according to userID
+        /// <param name="userId">used to get the specific user</param>
+        /// <returns>returns a user object from the database based on the given id</returns>
         public async Task<User> ReadUser(int userId)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
+        public async Task<User> ReadUserDetails(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Devices)
+                .ThenInclude(u => u.Logs)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
         // Returns a user according to refreshToken
-        public async Task<User> ReadUser(string refreshToken)
+        public async Task<User> ReadUserByRefreshToken(string refreshToken)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
         }
 
-        // Updates the refreshtoken saved in DB
-        public async void UpdatesRefreshToken(string refreshToken, int userId)
+        /// <summary>
+        ///  Used to check both email and login for the login.
+        /// </summary>
+        /// <param name="emailOrUsername">stores the input of username or email</param>
+        /// <returns>returns a user object from the database based on the given email or username</returns>
+        public async Task<User> ReadUserForLogin(string emailOrUsername)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (emailOrUsername.Contains("@"))
+            {
+                return await _context.Users.FirstOrDefaultAsync(u => u.Email == emailOrUsername);
+            }
+            else
+            {
+                return await _context.Users.FirstOrDefaultAsync(u => u.UserName == emailOrUsername);
+            }
+        }
 
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiresAt = DateTime.Now.AddDays(7);
+        /// <summary>
+        /// Gets all users 
+        /// </summary>
+        /// <returns>Return a list of users</returns>
+        public async Task<List<User>> ReadAllUsers()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
+        /// <summary>
+        /// Creates a user
+        /// </summary>
+        /// <param name="user">Need the entire user obj</param>
+        /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
+        public async Task<IActionResult> CreateUser(User user)
+        {
+            _context.Users.Add(user);
+
+            bool saved = await _context.SaveChangesAsync() == 1;
+
+            if (saved) { return new OkObjectResult(true); }
+
+            return new ConflictObjectResult(new { message = "Could not save to database" });
+
         }
 
         /// <summary>
@@ -102,55 +91,25 @@ namespace Api.DBAccess
         /// <param name="user">Contains the updated user info</param>
         /// <param name="userId">Has the id for the user that is to be updated</param>
         /// <returns>returns the updated user in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> UpdateUser(EditUserRequest user, int userId)
+        public async Task<IActionResult> UpdateUser(User user)
         {
-            var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var users = await _context.Users.ToListAsync();
-
-            if (profile == null) { return new ConflictObjectResult(new { message = "User does not exist" }); }
-
-            foreach (var item in users)
-            {
-                if (item.UserName == user.UserName && userId != item.Id)
-                {
-                    return new ConflictObjectResult(new { message = "Username is already in use." });
-                }
-
-                if (item.Email == user.Email && userId != item.Id)
-                {
-                    return new ConflictObjectResult(new { message = "Email is being used already" });
-                }
-            }
-
-            if(user.Email == "" || user.Email == null)
-                return new ConflictObjectResult(new { message = "Please enter an email" });
-
-            if (user.UserName == "" || user.UserName == null)
-                return new ConflictObjectResult(new { message = "Please enter a username" });
-
-            profile.Email = user.Email;
-            profile.UserName = user.UserName;
-
-
+            _context.Entry(user).State = EntityState.Modified;
 
             bool saved = await _context.SaveChangesAsync() == 1;
 
-            if (saved) { return new OkObjectResult(profile); }
+            if (saved) { return new OkObjectResult(user);}
 
             return new ConflictObjectResult(new { message = "Could not save to database" });
+
         }
 
-        public async Task<IActionResult> updatePassword(string newPassword, int userId)
+        public async Task<IActionResult> updatePassword(User user)
         {
-            var profile = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (profile == null) { return new ConflictObjectResult(new { message = "User does not exist" }); }
-
-            profile.Password = newPassword;
+            _context.Entry(user).State = EntityState.Modified;
 
             bool saved = await _context.SaveChangesAsync() == 1;
 
-            if (saved) { return new OkObjectResult(profile); }
+            if (saved) { return new OkObjectResult(user); }
 
             return new ConflictObjectResult(new { message = "Could not save to database" });
         }
@@ -160,76 +119,20 @@ namespace Api.DBAccess
         /// </summary>
         /// <param name="userId">The Id of the user that is to be deleted</param>
         /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> DeleteUser(int userId)
+        public async Task<IActionResult> DeleteUser(User user)
         {
-            var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
-            if (user != null)
-            {
-                if (user.Devices != null && user.Devices.Count > 0)
-                {
-                    foreach (var item in user.Devices)
-                    {
-                        var device = await _context.Devices.Include(d => d.Logs).FirstOrDefaultAsync(d => d.Id == item.Id);
-                        if (device != null) { _context.Devices.Remove(device); }
-                    }
-                }
-                _context.Users.Remove(user);
-                bool saved = await _context.SaveChangesAsync() >= 0;
-
-                if (saved) { return new OkObjectResult(saved); }
-
-                return new ConflictObjectResult(new { message = "Could not save to database" });
-            }
-            return new ConflictObjectResult(new { message = "Invalid user" });
-        }
-
-        // Returns devices according to userID
-        public async Task<List<GetDeviceDTO>> ReadDevices(int userId)
-        {
-            var user = await _context.Users.Include(u => u.Devices).ThenInclude(u => u.Logs).FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (user == null || user.Devices == null) { return new List<GetDeviceDTO>(); }
-
-            List<GetDeviceDTO> devices = new List<GetDeviceDTO>();
-
-            foreach (var item in user.Devices)
-            {
-                var latestLog = item.Logs?.OrderByDescending(log => log.Date).FirstOrDefault(); // Get the latest log
-                GetDeviceDTO device = new GetDeviceDTO
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    TempHigh = item.TempHigh,
-                    TempLow = item.TempLow,
-                    ReferenceId = item.ReferenceId,
-                    LatestLog = latestLog
-                };
-
-                devices.Add(device);
-            }
-
-            return devices;
-        }
-
-        /// <summary>
-        /// Creates a user using entityframework core
-        /// </summary>
-        /// <param name="device">The device that is going to be created</param>
-        /// <param name="userId">The user that owns the device</param>
-        /// <returns>returns the true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> CreateDevice(Device device, int userId)
-        {
-            var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (user == null || user.Devices == null) { return new ConflictObjectResult(new { message = "User did not have a device list" }); }
-
-            user.Devices.Add(device);
-
-            bool saved = await _context.SaveChangesAsync() == 1;
+            _context.Users.Remove(user);
+            bool saved = await _context.SaveChangesAsync() >= 0;
 
             if (saved) { return new OkObjectResult(saved); }
 
             return new ConflictObjectResult(new { message = "Could not save to database" });
+        }
+
+        // Returns all devices
+        public List<Device> ReadDevices()
+        {
+            return _context.Devices.ToList();
         }
 
         // Returns a device according to deviceId
@@ -238,12 +141,28 @@ namespace Api.DBAccess
             return await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
         }
 
-        // Returns a device according to refenreId
+        // Returns a device according to referenceId
         public Device ReadDevice(string referenceId)
         {
             return _context.Devices.FirstOrDefault(d => d.ReferenceId == referenceId);
         }
 
+        /// <summary>
+        /// Creates a user using entityframework core
+        /// </summary>
+        /// <param name="device">The device that is going to be created</param>
+        /// <param name="userId">The user that owns the device</param>
+        /// <returns>returns the true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
+        public async Task<IActionResult> CreateDevice(User user)
+        {
+            _context.Entry(user).State = EntityState.Modified;
+
+            bool saved = await _context.SaveChangesAsync() == 2;
+
+            if (saved) { return new OkObjectResult(user.Id); }
+
+            return new ConflictObjectResult(new { message = "Could not save to database" });
+        }
 
         /// <summary>
         /// Updates a device in the database
@@ -251,62 +170,25 @@ namespace Api.DBAccess
         /// <param name="request">Contains the updated device info</param>
         /// <param name="referenceId">Has the id for the device that is to be updated</param>
         /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> EditDevice(EditDeviceRequest request, int deviceId)
+        public async Task<IActionResult> EditDevice(Device device)
         {
-            var device = await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
-            if (device != null)
-            {
-                if (device.Name == "" || device.Name == null)
-                    return new ConflictObjectResult(new { message = "Please enter a name" });
+            _context.Entry(device).State = EntityState.Modified;
+    
+            bool saved = await _context.SaveChangesAsync() == 1;
 
-                device.Name = request.Name;
-                device.TempLow = request.TempLow;
-                device.TempHigh = request.TempHigh;
+            if (saved) { return new OkObjectResult(device); }
 
-                bool saved = await _context.SaveChangesAsync() >= 0;
-
-                if (saved) { return new OkObjectResult(saved); }
-
-                return new ConflictObjectResult(new { message = "Could not save to database" });
-            }
-            return new ConflictObjectResult(new { message = "Invalid device. May already be deleted" });
+            return new ConflictObjectResult(new { message = "Could not save to database" });
         }
 
-        public async Task<IActionResult> DeleteDevice(int deviceId, int userId)
+        public async Task<IActionResult> DeleteDevice(Device device)
         {
-            var user = await _context.Users
-                .Include(u => u.Devices)  // Ensure devices are loaded
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            _context.Devices.Remove(device);
+            bool saved = await _context.SaveChangesAsync() >= 0;
 
-            if (user == null)
-            {
-                return new NotFoundObjectResult(new { message = "User not found" });
-            }
+            if (saved) { return new OkObjectResult(saved); }
 
-            var device = user.Devices?.FirstOrDefault(d => d.Id == deviceId);
-
-            if (device != null || user.Devices != null)
-            {
-                user.Devices.Remove(device);
-                bool userDeviceDeleted = await _context.SaveChangesAsync() > 0;
-                if (userDeviceDeleted)
-                {
-                    _context.Devices.Remove(device);
-                    bool saved = await _context.SaveChangesAsync() > 0;
-
-                    if (saved) return new OkObjectResult(new { message = "Device deleted successfully" });
-                }
-
-                return new ConflictObjectResult(new { message = "Could not save to database" });
-            }
-
-            return new NotFoundObjectResult(new { message = "Device not found or already deleted" });
-        }
-
-        // Returns all devices
-        public List<Device> ReadDevices()
-        {
-            return _context.Devices.ToList();
+            return new ConflictObjectResult(new { message = "Could not save to database" });
         }
 
         /// <summary>

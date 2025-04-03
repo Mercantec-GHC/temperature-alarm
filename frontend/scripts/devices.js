@@ -3,9 +3,7 @@ import { devices } from "../mockdata/devices.mockdata.js";
 import { logout } from "../shared/utils.js";
 
 getDevices().then(res => {
-    if(!res.message){
-        buildTable(res)
-    }
+  buildTable(res)
 })
 
 let selectedId = null; // Store the selected referenceId
@@ -33,11 +31,6 @@ function buildTable(data) {
         table.appendChild(row);
     });
 
-
-    document.getElementById("addDevice").onclick = () => {
-      document.getElementById("addModal").style.display = "block";
-    }
-
     // Attach click event to all trash buttons
     document.querySelectorAll(".trashBtn").forEach((btn) => {
         btn.onclick = function () {
@@ -60,6 +53,11 @@ function buildTable(data) {
   });
 }
 
+document.getElementById("addDevice").onclick = () => {
+  document.getElementById("referenceId").value = "";
+  document.getElementById("addModal").style.display = "block";
+}
+
 
 document.querySelectorAll(".cancelbtn").forEach(button => {
   button.onclick = () => {
@@ -72,15 +70,27 @@ document.querySelectorAll(".cancelbtn").forEach(button => {
 // Delete button logic
 document.getElementById("deletebtn").onclick = () => {
     if (selectedId) {
-        deleteDevice(selectedId); // Call delete function with referenceId
-        window.location.reload();
+        deleteDevice(selectedId).then((response) => {
+          if (response?.error) {
+            document.getElementById("form-error").innerText = response.error;
+            document.getElementById("form-error").style.display = "block";
+            return;
+          }
+          window.location.reload();
+        });
     }
 };
 
 document.getElementById("addbtn").onclick = () => {
     const referenceId = document.getElementById("referenceId").value;
-      add(referenceId); // Call delete function with referenceId
-     window.location.reload();
+      add(referenceId).then((response) => {
+        if (response?.error) {
+          document.getElementById("form-error").innerText = response.error;
+          document.getElementById("form-error").style.display = "block";
+          return;
+        }
+        window.location.reload();
+      });
 };
 
 document.getElementById("editbtn").onclick = () => {
@@ -96,7 +106,7 @@ document.getElementById("editbtn").onclick = () => {
             document.getElementById("form-error").style.display = "block";
             return;
           }
-          location.href = "/devices";
+          window.location.reload();
         });
   }
 };

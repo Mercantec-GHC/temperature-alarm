@@ -75,10 +75,10 @@ namespace Api.Controllers
         [HttpDelete("Delete/{deviceId}")]
         public async Task<IActionResult> DeleteDevice(int deviceId)
         {
-            var claims = HttpContext.User.Claims;
-            string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            int userId = Convert.ToInt32(userIdString);
-            return await _deviceLogic.DeleteDevice(deviceId, userId);
+            //var claims = HttpContext.User.Claims;
+            //string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            //int userId = Convert.ToInt32(userIdString);
+            return await _deviceLogic.DeleteDevice(deviceId);
         }
     }
 }

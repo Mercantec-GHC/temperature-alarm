@@ -3,6 +3,7 @@ using Api.Models;
 using Api.Models.Devices;
 using Api.Models.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.BusinessLogic
 {
@@ -25,14 +26,28 @@ namespace Api.BusinessLogic
         /// <returns>returns the devices in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> GetDevices(int userId)
         {
-            var profile = await _dbAccess.ReadUser(userId);
+            var userDetails = await _dbAccess.ReadUserDetails(userId);
 
-            if (profile == null) { return new ConflictObjectResult(new { message = "Could not find user" }); }
+            if (userDetails.Devices.Count == 0) { return new OkObjectResult(new { message = "Could not find any devices connected to the user" }); }
 
-            var devices = await _dbAccess.ReadDevices(userId);
 
-            if (devices.Count == 0) { return new OkObjectResult(new { message = "Could not find any devices connected to the user" }); }
+            List<GetDeviceDTO> devices = new List<GetDeviceDTO>();
 
+            foreach (var item in userDetails.Devices)
+            {
+                var latestLog = item.Logs?.OrderByDescending(log => log.Date).FirstOrDefault(); // Get the latest log
+                GetDeviceDTO device = new GetDeviceDTO
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    TempHigh = item.TempHigh,
+                    TempLow = item.TempLow,
+                    ReferenceId = item.ReferenceId,
+                    LatestLog = latestLog
+                };
+
+                devices.Add(device);
+            }
             return new OkObjectResult(devices);
         }
 
@@ -45,12 +60,10 @@ namespace Api.BusinessLogic
         /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> AddDevice(string referenceId, int userId)
         {
-            var profile = await _dbAccess.ReadUser(userId);
+            var user = await _dbAccess.ReadUserDetails(userId);
             var possibleDevice = _dbAccess.ReadDevice(referenceId);
             if (possibleDevice != null) { return new ConflictObjectResult(new { message = "Device with given referenceId already exists" }); }
-
-
-            if (profile == null) { return new ConflictObjectResult(new { message = "Could not find user" }); }
+            if (user == null) { return new ConflictObjectResult(new { message = "Could not find user" }); }
 
             Device device = new Device
             {
@@ -61,8 +74,49 @@ namespace Api.BusinessLogic
                 Logs = new List<TemperatureLogs>(),
             };
 
+            user.Devices.Add(device);
 
-            return await _dbAccess.CreateDevice(device, userId);
+            return await _dbAccess.CreateDevice(user);
+        }
+
+        /// <summary>
+        /// Checks if the deviceId matches a device
+        /// </summary>
+        /// <param name="device">The updated info</param>
+        /// <param name="deviceId">The device to be edited</param>
+        /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
+        public async Task<IActionResult> EditDevice(EditDeviceRequest request, int deviceId)
+        {
+            var device = await _dbAccess.ReadDevice(deviceId);
+            if (device != null)
+            {
+                if (device.Name == "" || device.Name == null)
+                    return new ConflictObjectResult(new { message = "Please enter a name" });
+
+                device.Name = request.Name;
+                device.TempLow = request.TempLow;
+                device.TempHigh = request.TempHigh;
+
+            }
+
+            return await _dbAccess.EditDevice(device);
+        }
+
+        /// <summary>
+        /// deletes a device
+        /// </summary>
+        /// <param name="referenceId">the id used to delete</param>
+        /// <param name="userId">Used for deleting device from devices list in user</param>
+        /// <returns>returns OK</returns>
+        public async Task<IActionResult> DeleteDevice(int deviceId)
+        {
+            var device = await _dbAccess.ReadDevice(deviceId);
+            if (device != null)
+            {
+                return await _dbAccess.DeleteDevice(device);
+
+            }
+            return new ConflictObjectResult(new { message = "Invalid user" });
         }
 
         /// <summary>
@@ -82,28 +136,6 @@ namespace Api.BusinessLogic
             var logs = await _dbAccess.ReadLogs(deviceId, dateTimeRange);
 
             return new OkObjectResult(logs);
-        }
-
-        /// <summary>
-        /// Checks if the deviceId matches a device
-        /// </summary>
-        /// <param name="device">The updated info</param>
-        /// <param name="deviceId">The device to be edited</param>
-        /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> EditDevice(EditDeviceRequest device, int deviceId)
-        {
-            return await _dbAccess.EditDevice(device, deviceId);
-        }
-
-        /// <summary>
-        /// deletes a device
-        /// </summary>
-        /// <param name="referenceId">the id used to delete</param>
-        /// <param name="userId">Used for deleting device from devices list in user</param>
-        /// <returns>returns OK</returns>
-        public async Task<IActionResult> DeleteDevice(int deviceId, int userId)
-        {
-            return await _dbAccess.DeleteDevice(deviceId, userId);
         }
     }
 }

@@ -4,12 +4,14 @@ using Api.Models.Devices;
 using Api.Models.Users;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Api.BusinessLogic
 {
@@ -26,7 +28,7 @@ namespace Api.BusinessLogic
 
         public async Task<IActionResult> getUser(int userId)
         {
-            User user = await _dbAccess.getUser(userId);
+            User user = await _dbAccess.ReadUser(userId);
 
             if (user == null || user.Id == 0) { return new ConflictObjectResult(new { message = "Could not find user" }); }
             return new OkObjectResult(new { user.Id, user.UserName, user.Email });
@@ -40,29 +42,44 @@ namespace Api.BusinessLogic
         /// </summary>
         /// <param name="user">The new user</param>
         /// <returns>returns true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> RegisterUser(User user)
+        public async Task<IActionResult> RegisterUser(CreateUserRequest request)
         {
-            if (!new Regex(@".+@.+\..+").IsMatch(user.Email))
+            if (!new Regex(@".+@.+\..+").IsMatch(request.Email))
             {
                 return new ConflictObjectResult(new { message = "Invalid email address" });
             }
 
-            if (!PasswordSecurity(user.Password))
+            if (!PasswordSecurity(request.Password))
             {
                 return new ConflictObjectResult(new { message = "Password is not up to the security standard" });
             }
 
-            if (user.Devices == null)
+            var users = await _dbAccess.ReadAllUsers();
+
+            foreach (var item in users)
             {
-                user.Devices = new List<Device>();
+                if (item.UserName == request.UserName)
+                {
+                    return new ConflictObjectResult(new { message = "Username is already in use." });
+                }
+
+                if (item.Email == request.Email)
+                {
+                    return new ConflictObjectResult(new { message = "Email is being used already" });
+                }
             }
 
             string salt = Guid.NewGuid().ToString();
-            string hashedPassword = ComputeHash(user.Password, SHA256.Create(), salt);
+            string hashedPassword = ComputeHash(request.Password, SHA256.Create(), salt);
 
-            user.Salt = salt;
-            user.Password = hashedPassword;
-
+            User user = new User
+            {
+                UserName = request.UserName,
+                Email = request.Email,
+                Password = hashedPassword,
+                Salt = salt,
+                Devices = new List<Device>()
+            };
             return await _dbAccess.CreateUser(user);
         }
 
@@ -75,7 +92,7 @@ namespace Api.BusinessLogic
         /// <returns>Returns a jwt token, username and userid</returns>
         public async Task<IActionResult> Login(Login login)
         {
-            User user = await _dbAccess.Login(login);
+            User user = await _dbAccess.ReadUserForLogin(login.EmailOrUsrn);
 
             if (user == null || user.Id == 0) { return new ConflictObjectResult(new { message = "Could not find user" }); }
 
@@ -84,8 +101,8 @@ namespace Api.BusinessLogic
             if (user.Password == hashedPassword)
             {
                 var token = GenerateJwtToken(user);
-                user.RefreshToken = Guid.NewGuid().ToString();
-                _dbAccess.UpdatesRefreshToken(user.RefreshToken, user.Id);
+                user = await UpdateRefreshToken(user);              
+
                 return new OkObjectResult(new { token, user.UserName, user.Id, refreshToken = user.RefreshToken });
             }
 
@@ -103,12 +120,42 @@ namespace Api.BusinessLogic
         /// <returns>returns the updated user in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> EditProfile(EditUserRequest userRequest, int userId)
         {
-            return await _dbAccess.UpdateUser(userRequest, userId);
+            var profile = await _dbAccess.ReadUser(userId);
+            var users = await _dbAccess.ReadAllUsers();
+
+            if (profile == null) { return new ConflictObjectResult(new { message = "User does not exist" }); }
+
+            foreach (var item in users)
+            {
+                if (item.UserName == userRequest.UserName && userId != item.Id)
+                {
+                    return new ConflictObjectResult(new { message = "Username is already in use." });
+                }
+
+                if (item.Email == userRequest.Email && userId != item.Id)
+                {
+                    return new ConflictObjectResult(new { message = "Email is being used already" });
+                }
+            }
+
+            if (userRequest.Email == "" || userRequest.Email == null)
+                return new ConflictObjectResult(new { message = "Please enter an email" });
+
+            if (userRequest.UserName == "" || userRequest.UserName == null)
+                return new ConflictObjectResult(new { message = "Please enter a username" });
+
+            profile.Email = userRequest.Email;
+            profile.UserName = userRequest.UserName;
+
+
+            return await _dbAccess.UpdateUser(profile);
         }
 
         public async Task<IActionResult> changePassword(ChangePasswordRequest passwordRequest, int userId)
         {
             var user = await _dbAccess.ReadUser(userId);
+            if (user == null) { return new ConflictObjectResult(new { message = "User does not exist" }); }
+
 
             string hashedPassword = ComputeHash(passwordRequest.OldPassword, SHA256.Create(), user.Salt);
 
@@ -124,8 +171,9 @@ namespace Api.BusinessLogic
             }
 
             string hashedNewPassword = ComputeHash(passwordRequest.NewPassword, SHA256.Create(), user.Salt);
+            user.Password = hashedNewPassword;
 
-            return await _dbAccess.updatePassword(hashedNewPassword, userId);
+            return await _dbAccess.updatePassword(user);
         }
 
         /// <summary>
@@ -135,12 +183,19 @@ namespace Api.BusinessLogic
         /// <returns>returns the true in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
         public async Task<IActionResult> DeleteUser(int userId)
         {
-            return await _dbAccess.DeleteUser(userId);
+            var user = await _dbAccess.ReadUserDetails(userId);
+            if (user != null)
+            {
+                return await _dbAccess.DeleteUser(user);
+
+            }
+            return new ConflictObjectResult(new { message = "Invalid user" });
+        
         }
 
         public async Task<IActionResult> RefreshToken(string refreshToken)
         {
-            User user = await _dbAccess.ReadUser(refreshToken);
+            User user = await _dbAccess.ReadUserByRefreshToken(refreshToken);
             if (user == null) { return new ConflictObjectResult(new { message = "Could not match refreshtoken" }); }
             return new OkObjectResult(GenerateJwtToken(user));
         }
@@ -205,6 +260,14 @@ namespace Api.BusinessLogic
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private async Task<User> UpdateRefreshToken(User user)
+        {
+            user.RefreshToken = Guid.NewGuid().ToString();
+            user.RefreshTokenExpiresAt = DateTime.Now.AddDays(7);
+            await _dbAccess.UpdateUser(user);
+            return user;
         }
     }
 }

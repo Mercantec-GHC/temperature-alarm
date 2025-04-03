@@ -12,6 +12,6 @@
 
         public string? ReferenceId { get; set; }
 
-        public List<TemperatureLogs>? Logs { get; set; }
+        public List<TemperatureLogs> Logs { get; set; }
     }
 }

@@ -18,6 +18,6 @@ namespace Api.Models.Users
 
         public DateTime RefreshTokenExpiresAt { get; set; }
 
-        public List<Device>? Devices { get; set; }
+        public List<Device> Devices { get; set; }
     }
 }

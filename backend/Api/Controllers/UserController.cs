@@ -36,7 +36,7 @@ namespace Api.Controllers
 
         // Sends the user to userLogic
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest user)
         {
             return await _userLogic.RegisterUser(user);
         }
