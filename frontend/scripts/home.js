@@ -75,6 +75,12 @@ function randomColorChannelValue() {
     return Math.floor(Math.random() * 256);
 }
 
+function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+}
+
 async function fetchData() {
     document.body.classList.add("loading");
 
@@ -84,8 +90,6 @@ async function fetchData() {
     const deviceData = [];
 
     for (const device of devices) {
-        addDeviceToDropdown(device);
-
         const data = await getLogsOnDeviceId(device.id, startDate, endDate)
             .catch(handleError);
 
@@ -123,11 +127,20 @@ async function fetchData() {
                 scales: {
                     x: {
                         type: "time",
+                        time: {
+                            displayFormats: {
+                                hour: "HH:mm",
+                            },
+                        },
                     },
                 },
             },
         });
     }
+
+    chart.options.scales.x.time.unit = isSameDay(new Date(startDate), new Date(endDate))
+        ? "hour"
+        : "day";
 
     chart.data.datasets = deviceData.map((dataset, i) => {
         const color = new Array(3)
@@ -186,6 +199,9 @@ document.getElementById("all-time").onclick = () => setPeriod(null, null);
 document.querySelector(".logout-container").addEventListener("click", logout);
 
 const devices = await getDevices().catch(handleError);
+for (const device of devices) {
+    addDeviceToDropdown(device);
+}
 
 setPeriodLastDays(3);
 fetchData();

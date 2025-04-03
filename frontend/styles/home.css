@@ -124,6 +124,7 @@ table tr:not(:last-child) .temperature {
     padding: 0.5rem;
     color: #616161;
     background-color: white;
+    font-size: 0.85rem;
     cursor: pointer;
     transition-duration: 100ms;
 }
