@@ -76,6 +76,9 @@ table .temperature {
 table tr:not(:last-child) .temperature {
     border-bottom-color: white;
 }
+td {
+    white-space: nowrap;
+}
 
 .tempHigh {
     background-color: #ff0000;

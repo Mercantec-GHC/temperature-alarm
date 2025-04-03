@@ -29,8 +29,9 @@ function buildTable(data, offset = 0) {
             color = "tempNormal";
         }
 
-        const date = new Date(log.date).toLocaleDateString();
-        const time = new Date(log.date).toLocaleTimeString();
+        const parsedDate = luxon.DateTime.fromISO(log.date).setZone("Europe/Copenhagen").setLocale("gb");
+        const date = parsedDate.toLocaleString(luxon.DateTime.DATE_SHORT);
+        const time = parsedDate.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS);
 
         document.getElementById("table-body").innerHTML += `
             <tr>
@@ -81,11 +82,17 @@ function isSameDay(a, b) {
         a.getDate() === b.getDate();
 }
 
+function localToUTC(date) {
+    if (!date) return null;
+
+    return luxon.DateTime.fromISO(date, { zone: "Europe/Copenhagen" }).setZone("UTC");
+}
+
 async function fetchData() {
     document.body.classList.add("loading");
 
-    const startDate = document.getElementById("period-start").value;
-    const endDate = document.getElementById("period-end").value;
+    const startDate = localToUTC(document.getElementById("period-start").value);
+    const endDate = localToUTC(document.getElementById("period-end").value);
 
     const deviceData = [];
 
@@ -130,6 +137,11 @@ async function fetchData() {
                         time: {
                             displayFormats: {
                                 hour: "HH:mm",
+                            },
+                        },
+                        adapters: {
+                            date: {
+                                zone: "Europe/Copenhagen",
                             },
                         },
                     },
