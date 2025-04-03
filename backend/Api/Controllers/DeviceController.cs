@@ -34,8 +34,8 @@ namespace Api.Controllers
 
         // Sends the device and userId to deviceLogic
         [Authorize]
-        [HttpPost("adddevice")]
-        public async Task<IActionResult> AddDevice([FromBody] string referenceId)
+        [HttpPost("adddevice/{referenceId}")]
+        public async Task<IActionResult> AddDevice(string referenceId)
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -64,21 +64,21 @@ namespace Api.Controllers
 
         // Sends the deviceId to deviceLogic
         [Authorize]
-        [HttpPut("Edit/{deviceId}")]
-        public async Task<IActionResult> EditDevice([FromBody] Device device, int deviceId)
+        [HttpPut("update/{deviceId}")]
+        public async Task<IActionResult> EditDevice([FromBody] EditDeviceRequest device, int deviceId)
         {
             return await _deviceLogic.EditDevice(device, deviceId);
         }
 
         // Sends the userId to userLogic
         [Authorize]
-        [HttpDelete("Delete/{referenceId}")]
-        public async Task<IActionResult> DeleteUser(string referenceId)
+        [HttpDelete("Delete/{deviceId}")]
+        public async Task<IActionResult> DeleteDevice(int deviceId)
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userId = Convert.ToInt32(userIdString);
-            return await _deviceLogic.DeleteDevice(referenceId, userId);
+            return await _deviceLogic.DeleteDevice(deviceId, userId);
         }
     }
 }

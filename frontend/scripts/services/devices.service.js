@@ -5,15 +5,19 @@ export function getDevices() {
 }
 
 export function add(referenceId) {
-    return request("POST", "/device/adddevice", {referenceId: referenceId});
+    return request("POST", `/device/adddevice/${referenceId}`);
 }
 
-export function deleteDevice(referenceId) {
-    return request("DELETE", "/device", {referenceId: referenceId});
+export function deleteDevice(deviceId) {
+    return request("DELETE", `/device/delete/${deviceId}`);
 }
 
-export function update(name, temphigh, tempLow, referenceId) {
-    return request("PUT", "/device/edit", {name: name, temphigh: temphigh, tempLow: tempLow, referenceId: referenceId});
+export function update(deviceId, name, temphigh, tempLow) {
+    return request("PUT", `/device/update/${deviceId}`,{
+        name,
+        temphigh,
+        tempLow
+    });
 }
 
 export function getLogsOnDeviceId(id) {

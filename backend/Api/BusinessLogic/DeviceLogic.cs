@@ -31,7 +31,7 @@ namespace Api.BusinessLogic
 
             var devices = await _dbAccess.ReadDevices(userId);
 
-            if (devices.Count == 0) { return new ConflictObjectResult(new { message = "Could not find any devices connected to the user" }); }
+            if (devices.Count == 0) { return new OkObjectResult(new { message = "Could not find any devices connected to the user" }); }
 
             return new OkObjectResult(devices);
         }
@@ -46,6 +46,9 @@ namespace Api.BusinessLogic
         public async Task<IActionResult> AddDevice(string referenceId, int userId)
         {
             var profile = await _dbAccess.ReadUser(userId);
+            var possibleDevice = _dbAccess.ReadDevice(referenceId);
+            if (possibleDevice != null) { return new ConflictObjectResult(new { message = "Device with given referenceId already exists" }); }
+
 
             if (profile == null) { return new ConflictObjectResult(new { message = "Could not find user" }); }
 
@@ -97,13 +100,9 @@ namespace Api.BusinessLogic
         /// <param name="device">The updated info</param>
         /// <param name="deviceId">The device to be edited</param>
         /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> EditDevice(Device device, int deviceId)
+        public async Task<IActionResult> EditDevice(EditDeviceRequest device, int deviceId)
         {
-            var device1 = _dbAccess.ReadDevice(deviceId);
-
-            if (device1 == null) { return new ConflictObjectResult(new { message = "Could not find device" }); }
-
-            return await _dbAccess.UpdateDevice(device, deviceId);
+            return await _dbAccess.EditDevice(device, deviceId);
         }
 
         /// <summary>
@@ -112,9 +111,9 @@ namespace Api.BusinessLogic
         /// <param name="referenceId">the id used to delete</param>
         /// <param name="userId">Used for deleting device from devices list in user</param>
         /// <returns>returns OK</returns>
-        public async Task<IActionResult> DeleteDevice(string referenceId, int userId)
+        public async Task<IActionResult> DeleteDevice(int deviceId, int userId)
         {
-            return await _dbAccess.DeleteDevice(referenceId, userId);
+            return await _dbAccess.DeleteDevice(deviceId, userId);
         }
     }
 }

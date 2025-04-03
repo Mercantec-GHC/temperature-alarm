@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Api.Models.Devices;
 using Api.Models.Users;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Collections.Generic;
 
 
 namespace Api.DBAccess
@@ -182,13 +184,29 @@ namespace Api.DBAccess
         }
 
         // Returns devices according to userID
-        public async Task<List<Device>> ReadDevices(int userId)
+        public async Task<List<GetDeviceDTO>> ReadDevices(int userId)
         {
-            var user = await _context.Users.Include(u => u.Devices).FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.Devices).ThenInclude(u => u.Logs).FirstOrDefaultAsync(u => u.Id == userId);
 
-            if (user == null || user.Devices == null) { return new List<Device>(); }
+            if (user == null || user.Devices == null) { return new List<GetDeviceDTO>(); }
 
-            var devices = user.Devices;
+            List<GetDeviceDTO> devices = new List<GetDeviceDTO>();
+
+            foreach (var item in user.Devices)
+            {
+                var latestLog = item.Logs?.OrderByDescending(log => log.Date).FirstOrDefault(); // Get the latest log
+                GetDeviceDTO device = new GetDeviceDTO
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    TempHigh = item.TempHigh,
+                    TempLow = item.TempLow,
+                    ReferenceId = item.ReferenceId,
+                    LatestLog = latestLog
+                };
+
+                devices.Add(device);
+            }
 
             return devices;
         }
@@ -226,9 +244,16 @@ namespace Api.DBAccess
             return _context.Devices.FirstOrDefault(d => d.ReferenceId == referenceId);
         }
 
-        public async Task<IActionResult> EditDevice(EditDeviceRequest request, string referenceId)
+
+        /// <summary>
+        /// Updates a device in the database
+        /// </summary>
+        /// <param name="request">Contains the updated device info</param>
+        /// <param name="referenceId">Has the id for the device that is to be updated</param>
+        /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
+        public async Task<IActionResult> EditDevice(EditDeviceRequest request, int deviceId)
         {
-            var device = await _context.Devices.FirstOrDefaultAsync(d => d.ReferenceId == referenceId);
+            var device = await _context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
             if (device != null)
             {
                 if (device.Name == "" || device.Name == null)
@@ -247,7 +272,7 @@ namespace Api.DBAccess
             return new ConflictObjectResult(new { message = "Invalid device. May already be deleted" });
         }
 
-        public async Task<IActionResult> DeleteDevice(string referenceId, int userId)
+        public async Task<IActionResult> DeleteDevice(int deviceId, int userId)
         {
             var user = await _context.Users
                 .Include(u => u.Devices)  // Ensure devices are loaded
@@ -258,15 +283,19 @@ namespace Api.DBAccess
                 return new NotFoundObjectResult(new { message = "User not found" });
             }
 
-            var device = user.Devices?.FirstOrDefault(d => d.ReferenceId == referenceId);
+            var device = user.Devices?.FirstOrDefault(d => d.Id == deviceId);
 
             if (device != null || user.Devices != null)
             {
                 user.Devices.Remove(device);
-                _context.Devices.Remove(device);
-                bool saved = await _context.SaveChangesAsync() > 0;
+                bool userDeviceDeleted = await _context.SaveChangesAsync() > 0;
+                if (userDeviceDeleted)
+                {
+                    _context.Devices.Remove(device);
+                    bool saved = await _context.SaveChangesAsync() > 0;
 
-                if (saved) return new OkObjectResult(new { message = "Device deleted successfully" });
+                    if (saved) return new OkObjectResult(new { message = "Device deleted successfully" });
+                }
 
                 return new ConflictObjectResult(new { message = "Could not save to database" });
             }
@@ -278,33 +307,6 @@ namespace Api.DBAccess
         public List<Device> ReadDevices()
         {
             return _context.Devices.ToList();
-        }
-
-        /// <summary>
-        /// Updates a device in the database
-        /// </summary>
-        /// <param name="device">Contains the updated device info</param>
-        /// <param name="deviceId">Has the id for the device that is to be updated</param>
-        /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> UpdateDevice(Device device, int deviceId)
-        {
-            var device1 = await _context.Devices.FirstOrDefaultAsync(u => u.Id == deviceId);
-
-            if (device1 == null) { return new ConflictObjectResult(new { message = "Device does not exist" }); }
-
-            device1.TempLow = device.TempLow;
-
-            device1.TempHigh = device.TempHigh;
-
-            device1.ReferenceId = device.ReferenceId;
-
-            device1.Name = device.Name;
-
-            bool saved = await _context.SaveChangesAsync() == 1;
-
-            if (saved) { return new OkObjectResult(device1); }
-
-            return new ConflictObjectResult(new { message = "Could not save to database" });
         }
 
         /// <summary>
