@@ -315,11 +315,7 @@ namespace Api.DBAccess
         /// <returns></returns>
         public async Task<List<TemperatureLogs>> ReadLogs(int deviceId, DateTimeRange range)
         {
-            return _context.TemperatureLogs
-                .Where(log => log.DeviceId == deviceId)
-                .Where(log => log.Date > range.DateTimeStart)
-                .Where(log => log.Date < range.DateTimeEnd)
-                .ToList();
+            return _context.Devices.Include(d => d.Logs.Where(l => l.Date > range.DateTimeStart && l.Date < range.DateTimeEnd)).Where(d => d.Id == deviceId).FirstOrDefault().Logs;
         }
 
         /// <summary>

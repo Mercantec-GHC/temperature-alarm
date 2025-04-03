@@ -11,8 +11,6 @@ namespace Api
 
         public DbSet<Device> Devices { get; set; }
 
-        public DbSet<TemperatureLogs> TemperatureLogs { get; set; }
-
         public DBContext(DbContextOptions<DBContext> options) : base(options) { }
     }
 }
