@@ -4,6 +4,18 @@ body {
     background-color: #F9F9F9;
 }
 
+.loading * {
+    pointer-events: none;
+}
+
+.loading #chart, .loading table {
+    opacity: 50%;
+}
+
+.loading select, .loading input {
+    color: rgba(0, 0, 0, 0.3);
+}
+
 #container {
     margin: 0 2rem;
 }
@@ -13,16 +25,30 @@ body {
     border-radius: 8px;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
     border: 1px solid #DDD;
+    margin-bottom: 2rem;
+    background-color: white;
+}
+
+#filters {
+    margin: 2rem auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+#filters > * {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
-    background-color: white;
     color: #616161;
     font-family: arial, sans-serif;
     border-collapse: collapse;
+    transition: opacity ease-in 100ms;
 }
 
 td,
@@ -49,6 +75,9 @@ table .temperature {
 }
 table tr:not(:last-child) .temperature {
     border-bottom-color: white;
+}
+td {
+    white-space: nowrap;
 }
 
 .tempHigh {
@@ -82,6 +111,12 @@ table tr:not(:last-child) .temperature {
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
 }
 
+#chart {
+    width: 100%;
+    height: 400px;
+    transition: opacity ease-in 100ms;
+}
+
 #error {
     margin: 2rem;
 }
@@ -92,6 +127,7 @@ table tr:not(:last-child) .temperature {
     padding: 0.5rem;
     color: #616161;
     background-color: white;
+    font-size: 0.85rem;
     cursor: pointer;
     transition-duration: 100ms;
 }
@@ -102,5 +138,45 @@ table tr:not(:last-child) .temperature {
 
 #view-more:active {
     background-color: #FCFCFC;
+}
+
+.form-control {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 0.85rem;
+    padding-left: 0.2rem;
+    color: #616161;
+}
+
+select, input {
+    background-color: white;
+    color: #424242;
+    border: 1px solid #DDD;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: color ease-in 100ms;
+}
+
+select:focus, input:focus {
+    border-color: #1E88E5;
+}
+
+#period-templates {
+    display: flex;
+    gap: 1rem;
+}
+
+.period-template {
+    font-size: 0.85rem;
+    color: #616161;
+    cursor: pointer;
+    transition-duration: 100ms;
+}
+
+.period-template:hover {
+    color: #212121;
 }
 

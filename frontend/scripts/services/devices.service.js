@@ -20,6 +20,7 @@ export function update(deviceId, name, temphigh, tempLow) {
     });
 }
 
-export function getLogsOnDeviceId(id) {
-    return request("GET", `/device/logs/${id}`);
+export function getLogsOnDeviceId(id, startDate = null, endDate = null) {
+    const query = startDate && endDate ? `?dateTimeStart=${startDate}&dateTimeEnd=${endDate}` : "";
+    return request("GET", `/device/logs/${id}${query}`);
 }

@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Temperature-Alarm-Web</title>
         <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/moment"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/luxon"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
         <script defer type="module" src="/scripts/home.js"></script>
         <link rel="stylesheet" href="/styles/common.css">
         <link rel="stylesheet" href="/styles/home.css" />
@@ -26,8 +26,40 @@
           </div>
         <div id="container">
             <div class="chart-container">
-                <canvas id="myChart" style="width: 49%; height: 49%;"></canvas>
+                <canvas id="chart" height="400"></canvas>
             </div>
+
+            <div id="filters">
+                <div>
+                    <div class="form-control">
+                        <label for="device-selector">Select device</label>
+                        <select id="device-selector"></select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="form-control">
+                        <label>&nbsp;</label>
+                        <div id="period-templates">
+                            <div class="period-template last-x-days" data-days="0">Today</div>
+                            <div class="period-template last-x-days" data-days="3">Last 3 days</div>
+                            <div class="period-template last-x-days" data-days="7">Last week</div>
+                            <div class="period-template" id="all-time">All time</div>
+                        </div>
+                    </div>
+
+                    <div class="form-control">
+                        <label for="period-start">Start</label>
+                        <input id="period-start" type="datetime-local">
+                    </div>
+
+                    <div class="form-control">
+                        <label for="period-end">End</label>
+                        <input id="period-end" type="datetime-local">
+                    </div>
+                </div>
+            </div>
+
             <div id="table-wrapper">
                 <table>
                     <thead>

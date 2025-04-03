@@ -56,8 +56,8 @@ namespace Api.Controllers
             }
             else
             {
-                dateTimeRange.DateTimeStart = DateTime.Now;
-                dateTimeRange.DateTimeEnd = dateTimeRange.DateTimeStart;
+                dateTimeRange.DateTimeStart = DateTime.UnixEpoch;
+                dateTimeRange.DateTimeEnd = DateTime.Now;
             }
             return await _deviceLogic.GetLogs(dateTimeRange, deviceId);
         }

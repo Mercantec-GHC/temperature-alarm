@@ -79,19 +79,9 @@ namespace Api.BusinessLogic
 
             if (device == null) { return new ConflictObjectResult(new { message = "Could not find device" }); }
 
-            var logs = await _dbAccess.ReadLogs(deviceId);
+            var logs = await _dbAccess.ReadLogs(deviceId, dateTimeRange);
 
-            if (logs.Count == 0) { return new ConflictObjectResult(new { message = "Could not find any logs connected to the device" }); }
-
-            if (dateTimeRange.DateTimeStart == dateTimeRange.DateTimeEnd) { return new OkObjectResult(logs); }
-
-            List<TemperatureLogs> rangedLogs = new List<TemperatureLogs>();
-            foreach (var log in logs)
-            {
-                if (log.Date <= dateTimeRange.DateTimeStart && log.Date >= dateTimeRange.DateTimeEnd) { rangedLogs.Add(log); }
-            }
-
-            return new OkObjectResult(rangedLogs);
+            return new OkObjectResult(logs);
         }
 
         /// <summary>
