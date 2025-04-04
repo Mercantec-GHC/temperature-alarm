@@ -9,10 +9,29 @@
 #include "brokers/amqp.h"
 #include "devices/temperature.h"
 #include "devices/display.h"
+#include "devices/buzzer.h"
 #include "device_id.h"
+
+void *sound_alarm(void *arg)
+{
+	buzzer_handle_t buzzer = init_buzzer();
+
+	int delay = 170, length = 600;
+
+	for (int i = 0; i < 5; i++) {
+		sound_buzzer(buzzer, delay, length);
+
+		usleep(delay * 2 * length);
+	}
+
+	return NULL;
+}
 
 void *watch_temperature(void *arg)
 {
+	// TODO change
+	int max_temperature = 27, min_temperature = 18;
+
 	char *device_id = get_device_id();
 
 	printf("Device ID: %s\n", device_id);
@@ -53,6 +72,12 @@ void *watch_temperature(void *arg)
 		display_write_str(display, str);
 
 		free(str);
+
+		// Sound alarm if applicable
+		if (temperature < min_temperature || temperature > max_temperature) {
+			pthread_t alarm_thread;
+			pthread_create(&alarm_thread, NULL, sound_alarm, NULL);
+		}
 
 		printf("Temperature: %lf\n", temperature);
 
