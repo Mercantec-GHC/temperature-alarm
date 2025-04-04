@@ -24,6 +24,8 @@ void *sound_alarm(void *arg)
 		usleep(delay * 2 * length);
 	}
 
+	destroy_buzzer(buzzer);
+
 	return NULL;
 }
 
