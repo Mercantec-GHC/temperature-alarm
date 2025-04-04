@@ -6,10 +6,17 @@ getDevices().then(res => {
   buildTable(res)
 })
 
+
 let selectedId = null; // Store the selected referenceId
 const nameInput = document.getElementById("name");
 const tempHighInput = document.getElementById("tempHigh");
 const tempLowInput = document.getElementById("tempLow");
+
+const editbtn = document.getElementById("editbtn");
+
+var name;
+var tempHigh;
+var tempLow;
 
 function buildTable(data) {
     var table = document.getElementById("deviceTable");
@@ -40,17 +47,26 @@ function buildTable(data) {
         };
     });
 
+
+
     // Attach click event to all trash buttons
     document.querySelectorAll(".editIconbtn").forEach((btn) => {
       btn.onclick = function () {
           selectedId = this.getAttribute("data-id"); // Store referenceId
-        //   document.getElementById("editDeviceHeader").innerHTML = `Edit Device ${this.getAttribute("data-referenceId")}`;
+        document.getElementById("editDeviceHeader").innerHTML = `Edit Device ${this.getAttribute("data-referenceId")}`;
           nameInput.value = this.getAttribute("data-name");
           tempHighInput.value = this.getAttribute("data-tempHigh");
           tempLowInput.value = this.getAttribute("data-tempLow");
+          name = nameInput.value;
+          tempHigh = tempHighInput.value;
+          tempLow = tempLowInput.value;
+          editbtn.disabled = true;
           document.getElementById("editModal").style.display = "block";
+
       };
   });
+
+
 }
 
 document.getElementById("addDevice").onclick = () => {
@@ -67,6 +83,19 @@ document.querySelectorAll(".cancelbtn").forEach(button => {
 
   };
 });
+
+
+const checkForChanges = () => {
+  if (nameInput.value !== name || tempHighInput.value !== tempHigh || tempLowInput.value !== tempLow) {
+    editbtn.disabled = false; // Enable button if changes were made
+  } else {
+    editbtn.disabled = true; // Disable button if no changes
+  }
+};
+nameInput.addEventListener("input", checkForChanges);
+tempHighInput.addEventListener("input", checkForChanges);
+tempLowInput.addEventListener("input", checkForChanges);
+
 // Delete button logic
 document.getElementById("deletebtn").onclick = () => {
     if (selectedId) {
