@@ -197,7 +197,9 @@ namespace Api.BusinessLogic
         {
             User user = await _dbAccess.ReadUserByRefreshToken(refreshToken);
             if (user == null) { return new ConflictObjectResult(new { message = "Could not match refreshtoken" }); }
-            return new OkObjectResult(GenerateJwtToken(user));
+            user = await UpdateRefreshToken(user);
+            string jwtToken = GenerateJwtToken(user);
+            return new OkObjectResult(new { token = jwtToken, refreshToken = user.RefreshToken });
         }
 
         /// <summary>
@@ -265,7 +267,7 @@ namespace Api.BusinessLogic
         private async Task<User> UpdateRefreshToken(User user)
         {
             user.RefreshToken = Guid.NewGuid().ToString();
-            user.RefreshTokenExpiresAt = DateTime.Now.AddDays(7);
+            user.RefreshTokenExpiresAt = DateTime.Now.AddDays(30);
             await _dbAccess.UpdateUser(user);
             return user;
         }

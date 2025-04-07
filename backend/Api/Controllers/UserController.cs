@@ -74,5 +74,11 @@ namespace Api.Controllers
             return await _userLogic.DeleteUser(userId);
         }
 
+        [HttpPost("RefreshToken/{refreshToken}")]
+        public async Task<IActionResult> RefreshToken(string refreshToken)
+        {
+            return await _userLogic.RefreshToken(refreshToken);
+        }
+
     }
 }

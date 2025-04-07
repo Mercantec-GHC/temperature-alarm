@@ -11,7 +11,7 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
     login(emailOrUsername, password)
         .then(response => {
             document.cookie = `auth-token=${response.token}; Path=/`;
-
+            document.cookie = `refresh-token=${response.refreshToken}; Path=/`;
             localStorage.setItem("user", JSON.stringify({
                 id: response.id,
                 username: response.userName,

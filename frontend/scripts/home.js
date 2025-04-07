@@ -1,5 +1,4 @@
 import { logout } from "../shared/utils.js";
-import { getUser } from "../shared/utils.js";
 import { getDevices, getLogsOnDeviceId } from "./services/devices.service.js";
 
 let chart;
