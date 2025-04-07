@@ -4,6 +4,7 @@ using Api.Models.Devices;
 using Api.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Api.AMQP;
 
 namespace Api.BusinessLogic
 {
@@ -68,11 +69,17 @@ namespace Api.BusinessLogic
             Device device = new Device
             {
                 Name = "Undefined",
-                TempHigh = 0,
-                TempLow = 0,
+                TempHigh = 100,
+                TempLow = -40,
                 ReferenceId = referenceId,
                 Logs = new List<TemperatureLogs>(),
             };
+            DeviceLimit deviceLimit = new DeviceLimit();
+            deviceLimit.TempHigh = device.TempHigh;
+            deviceLimit.TempLow = device.TempLow;
+            deviceLimit.ReferenceId = device.ReferenceId;
+            AMQPPublisher publisher = new AMQPPublisher(_configuration);
+            publisher.Handle_Push_Device_Limits(deviceLimit);
 
             user.Devices.Add(device);
 
@@ -96,7 +103,12 @@ namespace Api.BusinessLogic
                 device.Name = request.Name;
                 device.TempLow = request.TempLow;
                 device.TempHigh = request.TempHigh;
-
+                DeviceLimit deviceLimit = new DeviceLimit();
+                deviceLimit.TempHigh = device.TempHigh;
+                deviceLimit.TempLow = device.TempLow;
+                deviceLimit.ReferenceId = device.ReferenceId;
+                AMQPPublisher publisher = new AMQPPublisher(_configuration);
+                publisher.Handle_Push_Device_Limits(deviceLimit);
             }
 
             return await _dbAccess.EditDevice(device);

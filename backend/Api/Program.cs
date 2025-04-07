@@ -29,8 +29,6 @@ class Program
                 {
                     AMQPReciever amqpReciever = new AMQPReciever(configuration, dbAccess);
                     amqpReciever.Handle_Received_Application_Message().Wait();
-                    AMQPPublisher aMQPPush = new AMQPPublisher(configuration, dbAccess);
-                    aMQPPush.Handle_Push_Device_Limits().Wait();
                 }
                 else if (rabbitMQ == "MQTT")
                 {

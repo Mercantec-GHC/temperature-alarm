@@ -10,15 +10,13 @@ namespace Api.AMQP
     public class AMQPPublisher
     {
         private readonly IConfiguration _configuration;
-        private readonly DbAccess _dbAccess;
         private IConnection _conn;
         private IChannel _channel;
         private ConnectionFactory _factory;
         private string _queue;
 
-        public AMQPPublisher(IConfiguration configuration, DbAccess dbAccess)
+        public AMQPPublisher(IConfiguration configuration)
         {
-            _dbAccess = dbAccess;
             _configuration = configuration;
             _factory = new ConnectionFactory();
             _queue = "temperature-limits";
@@ -26,51 +24,22 @@ namespace Api.AMQP
             InitFactory();
         }
 
-        public async Task Handle_Push_Device_Limits()
+        public async void Handle_Push_Device_Limits(DeviceLimit deviceLimit)
         {
-            while (true)
-            {
-                await Connect();
+            // Connecting to rabbitMQ
+            await Connect();
 
-                // Publishes all devices limits
-                var devices = _dbAccess.ReadDevices();
-                foreach (var device in devices)
-                {
-                    var deviceLimit = new DeviceLimit();
-                    deviceLimit.ReferenceId = device.ReferenceId;
-                    deviceLimit.TempHigh = device.TempHigh;
-                    deviceLimit.TempLow = device.TempLow;
-                    string message = JsonSerializer.Serialize(deviceLimit);
-                    var body = Encoding.UTF8.GetBytes(message);
-                    await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: _queue, body: body);
-                }
+            string message = JsonSerializer.Serialize(deviceLimit);
+            var body = Encoding.UTF8.GetBytes(message);
+            await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: _queue, body: body);
 
-                // Short delay before disconnecting from rabbitMQ
-                await Task.Delay(1000);
 
-                // Disconnecting from rabbitMQ to save resources
-                await Dispose();
-                // 1 hour delay
-                await Task.Delay(3600000);
+            // Short delay before disconnecting from rabbitMQ
+            await Task.Delay(1000);
 
-                await Connect();
+            // Disconnecting from rabbitMQ to save resources
+            await Dispose();
 
-                // Here all messages is consumed so the queue is empty
-                var consumer = new AsyncEventingBasicConsumer(_channel);
-                consumer.ReceivedAsync += (model, ea) =>
-                {
-                    Console.WriteLine("Emptying queue");
-
-                    return Task.CompletedTask;
-                };
-
-                // Consumes the data in the queue
-                await _channel.BasicConsumeAsync(_queue, true, consumer);
-
-                // Short delay before disconnecting from rabbitMQ
-                await Task.Delay(1000);
-                await Dispose();
-            }
         }
 
         // Disconnects from rabbitMQ
@@ -92,7 +61,7 @@ namespace Api.AMQP
             _channel = await _conn.CreateChannelAsync();
 
             // Here we connect to the queue through the channel that got created earlier
-            await _channel.QueueDeclareAsync(queue: _queue, durable: false, exclusive: false, autoDelete: false);
+            await _channel.QueueDeclareAsync(queue: _queue, durable: true, exclusive: false, autoDelete: false);
             Console.WriteLine($"{_queue} connected");
             return true;
         }
