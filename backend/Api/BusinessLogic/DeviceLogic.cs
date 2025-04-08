@@ -92,7 +92,7 @@ namespace Api.BusinessLogic
         /// <param name="device">The updated info</param>
         /// <param name="deviceId">The device to be edited</param>
         /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> EditDevice(EditDeviceRequest request, int deviceId)
+        public async Task<IActionResult> EditDevice(UpdateDeviceRequest request, int deviceId)
         {
             var device = await _dbAccess.ReadDevice(deviceId);
             if (device != null)
@@ -111,7 +111,7 @@ namespace Api.BusinessLogic
                 publisher.Handle_Push_Device_Limits(deviceLimit);
             }
 
-            return await _dbAccess.EditDevice(device);
+            return await _dbAccess.UpdateDevice(device);
         }
 
         /// <summary>

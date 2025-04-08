@@ -31,7 +31,7 @@ namespace Api.AMQP
 
             string message = JsonSerializer.Serialize(deviceLimit);
             var body = Encoding.UTF8.GetBytes(message);
-            await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: _queue, body: body);
+            await _channel.BasicPublishAsync(exchange: _queue, routingKey: _queue, body: body);
 
 
             // Short delay before disconnecting from rabbitMQ

@@ -19,8 +19,8 @@ namespace Api.Controllers
         }
 
         //[Authorize]
-        [HttpGet("Get")]
-        public async Task<IActionResult> GetUSer()
+        [HttpGet("get")]
+        public async Task<IActionResult> ReadUser()
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -28,14 +28,14 @@ namespace Api.Controllers
             return await _userLogic.getUser(userId);
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
             return await _userLogic.Login(login);
         }
 
         // Sends the user to userLogic
-        [HttpPost("Create")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest user)
         {
             return await _userLogic.RegisterUser(user);
@@ -43,7 +43,7 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpPut("change-password")]
-        public async Task<IActionResult> changePassword([FromBody] ChangePasswordRequest passwordRequest)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest passwordRequest)
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -54,8 +54,8 @@ namespace Api.Controllers
 
         // Sends the user and userId to userLogic
         [Authorize]
-        [HttpPut("Update")]
-        public async Task<IActionResult> EditUser([FromBody] EditUserRequest userRequest)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest userRequest)
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -65,7 +65,7 @@ namespace Api.Controllers
 
         // Sends the userId to userLogic
         [Authorize]
-        [HttpDelete("Delete")]
+        [HttpDelete("delete")]
         public async Task<IActionResult> DeleteUser()
         {
             var claims = HttpContext.User.Claims;
@@ -74,7 +74,7 @@ namespace Api.Controllers
             return await _userLogic.DeleteUser(userId);
         }
 
-        [HttpPost("RefreshToken/{refreshToken}")]
+        [HttpPost("refreshToken/{refreshToken}")]
         public async Task<IActionResult> RefreshToken(string refreshToken)
         {
             return await _userLogic.RefreshToken(refreshToken);

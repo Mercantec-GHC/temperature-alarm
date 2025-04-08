@@ -103,7 +103,7 @@ namespace Api.DBAccess
 
         }
 
-        public async Task<IActionResult> updatePassword(User user)
+        public async Task<IActionResult> UpdatePassword(User user)
         {
             _context.Entry(user).State = EntityState.Modified;
 
@@ -170,7 +170,7 @@ namespace Api.DBAccess
         /// <param name="request">Contains the updated device info</param>
         /// <param name="referenceId">Has the id for the device that is to be updated</param>
         /// <returns>returns the updated device in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> EditDevice(Device device)
+        public async Task<IActionResult> UpdateDevice(Device device)
         {
             _context.Entry(device).State = EntityState.Modified;
     

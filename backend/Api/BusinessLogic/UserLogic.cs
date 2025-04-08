@@ -118,7 +118,7 @@ namespace Api.BusinessLogic
         /// <param name="user">Contains the updated user info</param>
         /// <param name="userId">Has the id for the user that is to be updated</param>
         /// <returns>returns the updated user in a OkObjectResult and if there is some error it returns a ConflictObjectResult and a message that explain the reason</returns>
-        public async Task<IActionResult> EditProfile(EditUserRequest userRequest, int userId)
+        public async Task<IActionResult> EditProfile(UpdateUserRequest userRequest, int userId)
         {
             var profile = await _dbAccess.ReadUser(userId);
             var users = await _dbAccess.ReadAllUsers();
@@ -173,7 +173,7 @@ namespace Api.BusinessLogic
             string hashedNewPassword = ComputeHash(passwordRequest.NewPassword, SHA256.Create(), user.Salt);
             user.Password = hashedNewPassword;
 
-            return await _dbAccess.updatePassword(user);
+            return await _dbAccess.UpdatePassword(user);
         }
 
         /// <summary>

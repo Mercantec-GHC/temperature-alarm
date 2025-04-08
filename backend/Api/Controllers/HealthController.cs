@@ -14,10 +14,10 @@ namespace Api.Controllers
             _dbAccess = dbAccess;
         }
 
-        [HttpGet("API")]
+        [HttpGet("api")]
         public async Task<IActionResult> HealthAPI() { return Ok(true); }
 
-        [HttpGet("DB")]
+        [HttpGet("db")]
         public async Task<IActionResult> HealthDB() { return Ok(_dbAccess.Test()); }
     }
 }
