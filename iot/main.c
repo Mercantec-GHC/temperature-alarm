@@ -97,8 +97,16 @@ void *watch_temperature(void *arg)
 
 void broker_on_connect(void)
 {
-	amqp_subscribe("temperature-limits");
+	// Subscribe to messages from queue
+	char *queue = malloc(strlen("device-") + DEVICE_ID_SIZE + 1);
+	strcpy(queue, "device-");
+	strcat(queue, get_device_id());
 
+	amqp_subscribe("temperature-limits", queue);
+
+	free(queue);
+
+	// Start thread for watching temperature
 	pthread_t temperature_thread;
 	pthread_create(&temperature_thread, NULL, watch_temperature, NULL);
 }

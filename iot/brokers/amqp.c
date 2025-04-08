@@ -22,12 +22,18 @@ void amqp_send_message(char *queue, char *message)
 	props.content_type = amqp_literal_bytes("text/plain");
 	props.delivery_mode = 2;
 
-	amqp_basic_publish(conn, channel, amqp_cstring_bytes(queue), amqp_cstring_bytes(queue), 0, 0, &props, amqp_cstring_bytes(message));
+	amqp_basic_publish(conn, channel, amqp_cstring_bytes(queue), amqp_cstring_bytes(queue), false, false, &props, amqp_cstring_bytes(message));
 }
 
-void amqp_subscribe(char *queue)
+void amqp_subscribe(char *exchange, char *queue)
 {
-	amqp_basic_consume(conn, channel, amqp_cstring_bytes(queue), amqp_cstring_bytes("iot"), 1, 0, 0, amqp_empty_table);
+	amqp_exchange_declare(conn, channel, amqp_cstring_bytes(exchange), amqp_cstring_bytes("fanout"), false, false, false, false, amqp_empty_table);
+
+	amqp_queue_declare(conn, channel, amqp_cstring_bytes(queue), false, false, false, true, amqp_empty_table);
+
+	amqp_queue_bind(conn, channel, amqp_cstring_bytes(queue), amqp_cstring_bytes(exchange), amqp_empty_bytes, amqp_empty_table);
+
+	amqp_basic_consume(conn, channel, amqp_cstring_bytes(queue), amqp_cstring_bytes("iot"), true, true, false, amqp_empty_table);
 }
 
 char *amqp_bytes_to_cstring(amqp_bytes_t bytes)
@@ -57,12 +63,16 @@ void init_amqp(void)
 		amqp_envelope_t envelope;
 		amqp_consume_message(conn, &envelope, NULL, 0);
 
+		if (envelope.exchange.len == 0) {
+			continue;
+		}
+
 		char *exchange_name = amqp_bytes_to_cstring(envelope.exchange);
 		char *message = amqp_bytes_to_cstring(envelope.message.body);
 
-		if (broker_on_message(exchange_name, message)) {
-			amqp_basic_ack(conn, channel, envelope.delivery_tag, 0);
-		}
+		broker_on_message(exchange_name, message);
+
+		amqp_basic_ack(conn, channel, envelope.delivery_tag, false);
 
 		free(exchange_name);
 		free(message);

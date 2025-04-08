@@ -4,8 +4,6 @@
 
 #include "device_properties.h"
 
-#define DEVICE_ID_SIZE 5
-
 char *get_device_id(void)
 {
 	FILE *file = fopen("device_id.txt", "r");
