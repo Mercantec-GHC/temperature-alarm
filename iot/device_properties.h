@@ -1,3 +1,5 @@
+#define DEVICE_ID_SIZE 5
+
 char *get_device_id(void);
 char *generate_device_id(void);
 
