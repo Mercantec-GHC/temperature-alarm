@@ -28,7 +28,7 @@ function buildTable(data, offset = 0) {
             color = "tempNormal";
         }
 
-        const parsedDate = luxon.DateTime.fromISO(log.date).setZone("Europe/Copenhagen").setLocale("gb");
+        const parsedDate = luxon.DateTime.fromISO(log.date, { zone: "UTC" }).setZone("Europe/Copenhagen").setLocale("gb");
         const date = parsedDate.toLocaleString(luxon.DateTime.DATE_SHORT);
         const time = parsedDate.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS);
 
@@ -140,7 +140,7 @@ async function fetchData() {
                         },
                         adapters: {
                             date: {
-                                zone: "Europe/Copenhagen",
+                                zone: "system",
                             },
                         },
                     },
@@ -166,7 +166,7 @@ async function fetchData() {
             backgroundColor: `rgba(${color}, 1.0)`,
             borderColor: `rgba(${color}, 0.1)`,
             data: dataset.map(log => ({
-                x: new Date(log.date).getTime(),
+                x: luxon.DateTime.fromISO(log.date, { zone: "UTC" }).toMillis(),
                 y: log.temperature,
             })),
         };
