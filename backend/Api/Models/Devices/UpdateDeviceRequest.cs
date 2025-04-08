@@ -1,6 +1,6 @@
 ﻿namespace Api.Models.Devices
 {
-    public class EditDeviceRequest
+    public class UpdateDeviceRequest
     {
         public string Name { get; set; }
 

@@ -24,7 +24,7 @@ namespace Api.Controllers
         // Sends the userId to deviceLogic
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetDevices()
+        public async Task<IActionResult> ReadDevices()
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -34,8 +34,8 @@ namespace Api.Controllers
 
         // Sends the device and userId to deviceLogic
         [Authorize]
-        [HttpPost("adddevice/{referenceId}")]
-        public async Task<IActionResult> AddDevice(string referenceId)
+        [HttpPost("add/{referenceId}")]
+        public async Task<IActionResult> CreateDevice(string referenceId)
         {
             var claims = HttpContext.User.Claims;
             string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -46,7 +46,7 @@ namespace Api.Controllers
         // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpGet("logs/{deviceId}")]
-        public async Task<IActionResult> GetLogs(int deviceId, DateTime? dateTimeStart = null, DateTime? dateTimeEnd = null)
+        public async Task<IActionResult> ReadLogs(int deviceId, DateTime? dateTimeStart = null, DateTime? dateTimeEnd = null)
         {
             DateTimeRange dateTimeRange = new DateTimeRange();
             if (dateTimeStart != null && dateTimeEnd != null)
@@ -65,19 +65,16 @@ namespace Api.Controllers
         // Sends the deviceId to deviceLogic
         [Authorize]
         [HttpPut("update/{deviceId}")]
-        public async Task<IActionResult> EditDevice([FromBody] EditDeviceRequest device, int deviceId)
+        public async Task<IActionResult> UpdateDevice([FromBody] UpdateDeviceRequest device, int deviceId)
         {
             return await _deviceLogic.EditDevice(device, deviceId);
         }
 
         // Sends the userId to userLogic
         [Authorize]
-        [HttpDelete("Delete/{deviceId}")]
+        [HttpDelete("delete/{deviceId}")]
         public async Task<IActionResult> DeleteDevice(int deviceId)
         {
-            //var claims = HttpContext.User.Claims;
-            //string userIdString = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            //int userId = Convert.ToInt32(userIdString);
             return await _deviceLogic.DeleteDevice(deviceId);
         }
     }
