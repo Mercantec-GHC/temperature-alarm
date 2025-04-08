@@ -90,7 +90,7 @@ async function fetchData() {
     const deviceData = [];
 
     for (const device of devices) {
-        const data = await getLogsOnDeviceId(device.id, startDate.setZone("UTC"), endDate.setZone("UTC"))
+        const data = await getLogsOnDeviceId(device.id, startDate?.setZone("UTC"), endDate?.setZone("UTC"))
             .catch(handleError);
 
         deviceData.push(data);
@@ -148,7 +148,7 @@ async function fetchData() {
         });
     }
 
-    chart.options.scales.x.time.unit = startDate.hasSame(endDate, "day") ? "hour" : "day";
+    chart.options.scales.x.time.unit = startDate?.hasSame(endDate, "day") ? "hour" : "day";
 
     chart.data.datasets = deviceData.map((dataset, i) => {
         const color = new Array(3)
