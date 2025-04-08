@@ -115,7 +115,8 @@ async function fetchData() {
                 datasets: [],
             },
             options: {
-                responsive: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 parsing: false,
                 plugins: {
                     tooltip: {
