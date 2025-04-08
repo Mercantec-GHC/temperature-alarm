@@ -29,7 +29,7 @@ function buildTable(data) {
             <td>${device.name}</td>
             <td>${device.tempHigh}</td>
             <td>${device.tempLow}</td>
-            <td>Temperature: ${device.latestLog}°C, Date: ${device.latestLog}</td>
+            <td>Temperature: ${device.latestLog.temperature}°C, Date: ${luxon.DateTime.fromISO(device.latestLog.date, { zone: "UTC" }).setZone("Europe/Copenhagen").toFormat("DD T")}</td>
             <td style="width: 90px;">
                 <img class="editIconbtn tableIcons" src="/img/Edit.png" data-id="${device.id}" data-referenceId="${device.referenceId}" data-name="${device.name}" data-tempHigh="${device.tempHigh}" data-tempLow="${device.tempLow}">
                 <img class="trashBtn tableIcons" src="/img/Trash.png" data-id="${device.id}" data-referenceId="${device.referenceId}">
