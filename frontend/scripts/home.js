@@ -75,28 +75,22 @@ function randomColorChannelValue() {
     return Math.floor(Math.random() * 256);
 }
 
-function isSameDay(a, b) {
-    return a.getFullYear() === b.getFullYear() &&
-        a.getMonth() === b.getMonth() &&
-        a.getDate() === b.getDate();
-}
-
-function localToUTC(date) {
+function parseDate(date) {
     if (!date) return null;
 
-    return luxon.DateTime.fromISO(date, { zone: "Europe/Copenhagen" }).setZone("UTC");
+    return luxon.DateTime.fromISO(date, { zone: "Europe/Copenhagen" });
 }
 
 async function fetchData() {
     document.body.classList.add("loading");
 
-    const startDate = localToUTC(document.getElementById("period-start").value);
-    const endDate = localToUTC(document.getElementById("period-end").value);
+    const startDate = parseDate(document.getElementById("period-start").value);
+    const endDate = parseDate(document.getElementById("period-end").value);
 
     const deviceData = [];
 
     for (const device of devices) {
-        const data = await getLogsOnDeviceId(device.id, startDate, endDate)
+        const data = await getLogsOnDeviceId(device.id, startDate.setZone("UTC"), endDate.setZone("UTC"))
             .catch(handleError);
 
         deviceData.push(data);
@@ -108,6 +102,11 @@ async function fetchData() {
 
     document.getElementById("table-body").innerHTML = "";
     buildTable(deviceData[0]);
+
+    document.getElementById("device-selector").oninput = event => {
+        document.getElementById("table-body").innerHTML = "";
+        buildTable(deviceData[event.target.selectedIndex]);
+    };
 
     if (!chart) {
         chart = new Chart("chart", {
@@ -149,9 +148,7 @@ async function fetchData() {
         });
     }
 
-    chart.options.scales.x.time.unit = isSameDay(new Date(startDate), new Date(endDate))
-        ? "hour"
-        : "day";
+    chart.options.scales.x.time.unit = startDate.hasSame(endDate, "day") ? "hour" : "day";
 
     chart.data.datasets = deviceData.map((dataset, i) => {
         const color = new Array(3)
