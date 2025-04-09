@@ -30,6 +30,9 @@ The following library packages are required by the IoT code and should be instal
 `apt install libmosquitto-dev librabbitmq-dev libi2c-dev libgpiod-dev libcjson-dev`
 
 > [!NOTE]
+> The gpiod library must be below version 2.0. Debian Bookworm still distributes the old version of the library.
+
+> [!NOTE]
 > The RabbitMQ apt package is missing the header files - They can be copied from [here](https://github.com/alanxz/rabbitmq-c/tree/master/include/rabbitmq-c) into the `/usr/include/rabbitmq-c` folder
 
 Copy the source files onto the BeagleBone and run the following command to compile and run the code:
