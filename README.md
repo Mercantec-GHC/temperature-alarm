@@ -6,7 +6,7 @@
 
 ## Setup
 
-In the `backend` folder, copy `appsettings.example.json` into `appsettings.json` and fill out the values.
+In the `backend/Api` folder, copy `appsettings.example.json` into `appsettings.json` and fill out the values.
 
 In the `frontend` folder, copy `shared/constants.example.js` into `shared/constants.js` and fill out the values.
 
