@@ -78,6 +78,7 @@ void *watch_temperature(void *arg)
 
 		// Sound alarm if applicable
 		if (
+			temperature < 200.0 &&
 			min_temperature != NAN && max_temperature != NAN &&
 			(temperature < min_temperature || temperature > max_temperature)
 		) {
