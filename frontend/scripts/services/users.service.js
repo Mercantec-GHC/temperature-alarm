@@ -39,7 +39,7 @@ export function update(email, username){
 }
 
 export function updatePassword(oldPassword, newPassword){
-    return request("PUT", "/user/update-password", {
+    return request("PUT", "/user/change-password", {
         oldPassword,
         newPassword,
     });

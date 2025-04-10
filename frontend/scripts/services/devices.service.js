@@ -5,7 +5,7 @@ export function getDevices() {
 }
 
 export function add(referenceId) {
-    return request("POST", `/device/adddevice/${referenceId}`);
+    return request("POST", `/device/add/${referenceId}`);
 }
 
 export function deleteDevice(deviceId) {

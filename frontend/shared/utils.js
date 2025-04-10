@@ -41,36 +41,36 @@ export async function request(method, path, body = null) {
 
 export function checkTokens() {
     var token = document.cookie.match(/\bauth-token=([^;\s]+)/);
-    if(token != null){
-        return token[1]
+    if (token != null) {
+        return token[1];
     }
+
     const match = document.cookie.match(/\brefresh-token=([^;\s]+)/);
     token = match ? match[1] : null;
-    console.log("refresh "+token); 
-   if(token != null){
-    return fetch(`${address}/user/refreshtoken/${token}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-    })
-    .then(async response => {
-        if (!response.ok) {
-            window.location.href = "/login";
-            return;
-        }
-    
-        const json = await response.json()
-    
-        document.cookie = `auth-token=${json.token}; Path=/`;
-        document.cookie = `refresh-token=${json.refreshToken}; Path=/`;
-    
-        return json.token;
-    });
-   }
-   else{
-    window.location.href = "/login";
-   }
+
+    if (token != null) {
+        return fetch(`${address}/user/refreshtoken/${token}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        .then(async response => {
+            if (!response.ok) {
+                location.href = "/login";
+                return;
+            }
+
+            const json = await response.json()
+
+            document.cookie = `auth-token=${json.token}; Path=/`;
+            document.cookie = `refresh-token=${json.refreshToken}; Path=/`;
+
+            return json.token;
+        });
+    }
+
+    location.href = "/login";
 }
 
 export function logout() {

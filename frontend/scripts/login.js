@@ -10,14 +10,15 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
     
     login(emailOrUsername, password)
         .then(response => {
-            document.cookie = `auth-token=${response.token}; Path=/`;
-            document.cookie = `refresh-token=${response.refreshToken}; Path=/`;
-            localStorage.setItem("user", JSON.stringify({
-                id: response.id,
-                username: response.userName,
-            }));
-
-            location.href = "/home";
+            if(response.token && response.refreshToken){
+                document.cookie = `auth-token=${response.token}; Path=/`;
+                document.cookie = `refresh-token=${response.refreshToken}; Path=/`;
+                localStorage.setItem("user", JSON.stringify({
+                    id: response.id,
+                    username: response.userName,
+                }));
+                location.href = "/home";
+            }
         })
         .catch(error => {
             document.getElementById("form-error").innerText = error;

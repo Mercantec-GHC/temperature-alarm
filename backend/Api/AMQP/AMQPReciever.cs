@@ -41,7 +41,7 @@ namespace Api.AMQPReciever
                 var messageReceive = JsonSerializer.Deserialize<MessageReceive>(message);
 
                 // Checks if the message has the data we need
-                if (messageReceive == null || messageReceive.device_id == null || messageReceive.timestamp == 0)
+                if (messageReceive == null || messageReceive.device_id == null || messageReceive.timestamp == 0 || messageReceive.temperature > 200.0)
                 {
                     return Task.CompletedTask;
                 }
