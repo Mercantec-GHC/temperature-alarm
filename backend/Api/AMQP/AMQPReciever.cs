@@ -34,7 +34,7 @@ namespace Api.AMQPReciever
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += (model, ea) =>
             {
-                Console.WriteLine("Received application message.");
+                Console.WriteLine("\nReceived application message.\n");
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
