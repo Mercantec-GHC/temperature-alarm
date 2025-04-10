@@ -30,6 +30,12 @@ table {
 .tableConatiner{
   display: flex;
   justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #DDD;
+  margin-bottom: 2rem;
+  background-color: white;
 }
 
 .tableIcons{
@@ -79,7 +85,7 @@ table {
   
   /* Add padding and center-align text to the container */
   .container {
-    padding: 16px;
+    margin: 0 2rem;
   }
   
   /* The Modal (background) */

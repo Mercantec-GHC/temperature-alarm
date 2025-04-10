@@ -1,9 +1,7 @@
 ﻿using Api.DBAccess;
 using Api.Models;
 using Api.Models.Devices;
-using Api.Models.Users;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Api.AMQP;
 
 namespace Api.BusinessLogic
@@ -29,7 +27,7 @@ namespace Api.BusinessLogic
         {
             var userDetails = await _dbAccess.ReadUserDetails(userId);
 
-            if (userDetails.Devices.Count == 0) { return new OkObjectResult(new { message = "Could not find any devices connected to the user" }); }
+            if (userDetails.Devices.Count == 0) { return new ConflictObjectResult(new { message = "Could not find any devices connected to the user" }); }
 
 
             List<GetDeviceDTO> devices = new List<GetDeviceDTO>();

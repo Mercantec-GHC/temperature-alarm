@@ -6,7 +6,8 @@
     <title>Temperature-Alarm-Web</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/luxon"></script>
-        <link rel="stylesheet" href="/styles/auth.css">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/styles/auth.css">
     <link rel="stylesheet" href="/styles/devices.css" />
     <script defer type="module" src="/scripts/devices.js"></script>
   </head>
@@ -26,19 +27,24 @@
           <div class="addDeviceContainer">
             <button id="addDevice">Add Device</button>
           </div>
-          <div class="tableConatiner">
-            <table>
-              <tr>
-                <th>Id</th>
-                <th>Placement(name)</th>
-                <th>Set Temp High</th>
-                <th>Set Temp Low</th>
-                <th>Latest Meassurement</th>
-                <th></th>
-              </tr>
-              <tbody id="deviceTable"></tbody>
-            </table>
+          <div style="display: flex; justify-content: center;">
+            <div class="tableConatiner">
+              <table>
+                <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Placement(name)</th>
+                  <th>Set Temp High</th>
+                  <th>Set Temp Low</th>
+                  <th>Latest Meassurement</th>
+                  <th></th>
+                </tr>
+              </thead>
+                <tbody id="deviceTable"></tbody>
+              </table>
+            </div>
           </div>
+          <div id="get-error" class="error"></div>
     </div>
 
 
@@ -52,6 +58,7 @@
             <button type="button" class="cancelbtn">Cancel</button>
             <button type="button" id="deletebtn">Delete</button>
           </div>
+          <div id="delete-error" class="error"></div>
         </div>
       </form>
     </div>
@@ -76,8 +83,8 @@
                       <button type="button" id="editbtn">Save Changes</button>
                     </div>
     
-                    <div id="form-error"></div>
-                </div>
+                    <div id="edit-error" class="error"></div>
+                  </div>
             </form>
         </div>
       </div>
@@ -98,8 +105,8 @@
                 <button type="button" id="addbtn">Add</button>
               </div>
 
-              <div id="form-error"></div>
-          </form>
+              <div id="add-error" class="error"></div>
+            </form>
       </div>
     </div>
 </div>

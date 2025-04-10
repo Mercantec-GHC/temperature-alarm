@@ -18,7 +18,7 @@ namespace Api.Controllers
             _userLogic = userLogic;
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("get")]
         public async Task<IActionResult> ReadUser()
         {

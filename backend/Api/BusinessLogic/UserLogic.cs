@@ -258,7 +258,7 @@ namespace Api.BusinessLogic
                 _configuration["JwtSettings:Issuer"],
                 _configuration["JwtSettings:Audience"],
                 claims,
-                expires: DateTime.Now.AddHours(2),
+                expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

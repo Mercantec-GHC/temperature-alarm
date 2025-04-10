@@ -1,10 +1,11 @@
 import { add, getDevices, update, deleteDevice } from "./services/devices.service.js";
-import { devices } from "../mockdata/devices.mockdata.js";
 import { logout } from "../shared/utils.js";
 
-getDevices().then(res => {
-  buildTable(res)
-})
+getDevices().then((res) => buildTable(res))
+      .catch(error => {
+          document.getElementById("get-error").innerText = error;
+          document.getElementById("get-error").style.display = "block";
+      });
 
 
 let selectedId = null; // Store the selected referenceId
@@ -23,26 +24,32 @@ function buildTable(data) {
     table.innerHTML = ""; // Clear existing rows before adding new ones
 
     data.forEach((device) => {
-        var row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${device.referenceId}</td>
-            <td>${device.name}</td>
-            <td>${device.tempHigh}</td>
-            <td>${device.tempLow}</td>
-            <td>Temperature: ${device.latestLog.temperature}°C, Date: ${luxon.DateTime.fromISO(device.latestLog.date, { zone: "UTC" }).setZone("Europe/Copenhagen").toFormat("DD T")}</td>
-            <td style="width: 90px;">
-                <img class="editIconbtn tableIcons" src="/img/Edit.png" data-id="${device.id}" data-referenceId="${device.referenceId}" data-name="${device.name}" data-tempHigh="${device.tempHigh}" data-tempLow="${device.tempLow}">
-                <img class="trashBtn tableIcons" src="/img/Trash.png" data-id="${device.id}" data-referenceId="${device.referenceId}">
-            </td>
-        `;
-        table.appendChild(row);
-    });
+      const latestLog = device.latestLog;
+      const temperatureText = latestLog
+          ? `Temperature: ${latestLog.temperature}°C, Date: ${luxon.DateTime.fromISO(latestLog.date, { zone: "UTC" }).setZone("Europe/Copenhagen").toFormat("DD T")}`
+          : "No logs yet";
+  
+      const row = document.createElement("tr");
+      row.innerHTML = `
+          <td>${device.referenceId}</td>
+          <td>${device.name}</td>
+          <td>${device.tempHigh}</td>
+          <td>${device.tempLow}</td>
+          <td>${temperatureText}</td>
+          <td style="width: 90px;">
+              <img class="editIconbtn tableIcons" src="/img/Edit.png" data-id="${device.id}" data-referenceId="${device.referenceId}" data-name="${device.name}" data-tempHigh="${device.tempHigh}" data-tempLow="${device.tempLow}">
+              <img class="trashBtn tableIcons" src="/img/Trash.png" data-id="${device.id}" data-referenceId="${device.referenceId}">
+          </td>
+      `;
+      table.appendChild(row);
+  });
+  
 
     // Attach click event to all trash buttons
     document.querySelectorAll(".trashBtn").forEach((btn) => {
         btn.onclick = function () {
             selectedId = this.getAttribute("data-id"); // Store referenceId
-            // document.getElementById("deleteDeviceHeader").innerHTML = `Delete Device ${this.getAttribute("data-referenceId")}`;
+            document.getElementById("deleteDeviceHeader").innerHTML = `Delete Device ${this.getAttribute("data-referenceId")}`;
             document.getElementById("deleteModal").style.display = "block";
         };
     });
@@ -81,6 +88,13 @@ document.querySelectorAll(".cancelbtn").forEach(button => {
       document.getElementById("editModal").style.display = "none";
       document.getElementById("addModal").style.display = "none";
 
+      document.getElementById("add-error").style.display = "none";
+      document.getElementById("add-error").innerText = "";
+      document.getElementById("delete-error").style.display = "none";
+      document.getElementById("delete-error").innerText = "";
+      document.getElementById("edit-error").style.display = "none";
+      document.getElementById("edit-error").innerText = "";
+
   };
 });
 
@@ -99,26 +113,20 @@ tempLowInput.addEventListener("input", checkForChanges);
 // Delete button logic
 document.getElementById("deletebtn").onclick = () => {
     if (selectedId) {
-        deleteDevice(selectedId).then((response) => {
-          if (response?.error) {
-            document.getElementById("form-error").innerText = response.error;
-            document.getElementById("form-error").style.display = "block";
-            return;
-          }
-          window.location.reload();
+        deleteDevice(selectedId).then(() => location.reload())
+        .catch(error => {
+            document.getElementById("delete-error").innerText = error;
+            document.getElementById("delete-error").style.display = "block";
         });
     }
 };
 
 document.getElementById("addbtn").onclick = () => {
     const referenceId = document.getElementById("referenceId").value;
-      add(referenceId).then((response) => {
-        if (response?.error) {
-          document.getElementById("form-error").innerText = response.error;
-          document.getElementById("form-error").style.display = "block";
-          return;
-        }
-        window.location.reload();
+      add(referenceId).then(() => location.reload())
+      .catch(error => {
+          document.getElementById("add-error").innerText = error;
+          document.getElementById("add-error").style.display = "block";
       });
 };
 
@@ -129,14 +137,11 @@ document.getElementById("editbtn").onclick = () => {
     const tempLow = document.getElementById("tempLow").value;
 
 
-    update(selectedId, name, tempHigh, tempLow).then((response) => {
-          if (response?.error) {
-            document.getElementById("form-error").innerText = response.error;
-            document.getElementById("form-error").style.display = "block";
-            return;
-          }
-          window.location.reload();
-        });
+    update(selectedId, name, tempHigh, tempLow).then(() => location.reload())
+      .catch(error => {
+          document.getElementById("edit-error").innerText = error;
+          document.getElementById("edit-error").style.display = "block";
+      });
   }
 };
 
