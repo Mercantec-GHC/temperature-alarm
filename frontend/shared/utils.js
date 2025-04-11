@@ -22,7 +22,7 @@ export async function request(method, path, body = null) {
         })
             .then(async response => {
                 if (response.status === 401) {
-                   await getTokenByReferenceId(method, path, body);
+                    getTokenByReferenceId(method, path, body);
                 }
 
                 try {
@@ -45,11 +45,10 @@ export async function request(method, path, body = null) {
     });
 }
 
-export async function getTokenByReferenceId(method, path, body = null) {
-    console.log("gtbri");
+export function getTokenByReferenceId(method, path, body = null) {
     var token = document.cookie.match(/\brefresh-token=([^;\s]+)/);
     if (token != null) {
-        return await fetch(`${address}/user/refreshtoken/${token[1]}`, {
+        return fetch(`${address}/user/refreshtoken/${token[1]}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -60,7 +59,6 @@ export async function getTokenByReferenceId(method, path, body = null) {
 
             document.cookie = `auth-token=${json.token}; Path=/`;
             document.cookie = `refresh-token=${json.refreshToken}; Path=/`;
-            console.log(json.token);
 
             return request(method, path, body);
         })
@@ -68,7 +66,6 @@ export async function getTokenByReferenceId(method, path, body = null) {
             location.href = "/login";
         });
     }
-
 }
 
 export function logout() {
