@@ -12,9 +12,6 @@ table {
     padding: 8px;
   }
   
-  tr:nth-child(even) {
-    background-color: #dddddd;
-}
 
 .addDeviceContainer{
     margin-top: 20px;
