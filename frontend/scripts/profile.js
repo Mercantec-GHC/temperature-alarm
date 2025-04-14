@@ -75,18 +75,13 @@ document
     .addEventListener("submit", function (event) {
         event.preventDefault(); // Prevents default form submission
 
-        document.getElementById("form-error").style.display = "none";
+        document.getElementById("editprofile-error").style.display = "none";
 
         // Call function with form values
-        update(emailInput.value, usernameInput.value).then((response) => {
-            if (response?.error) {
-                document.getElementById("form-error").innerText = response.error;
-                document.getElementById("form-error").style.display = "block";
-
-                return;
-            }
-
-            location.href = "/profile";
+        update(emailInput.value, usernameInput.value).then(() => location.reload())
+        .catch(error => {
+            document.getElementById("editprofile-error").innerText = error;
+            document.getElementById("editprofile-error").style.display = "block";
         });
     });
 
